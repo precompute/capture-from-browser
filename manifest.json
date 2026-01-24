@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Capture To File",
+  "version": "1.0",
+  "description": "Capture selection and HTML to local backend.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["http://localhost:18080/*"],
+  "background": {
+    "scripts": ["background.js"], // For firefox
+    "service_worker": "background.js" // Firefox complains about service_worker
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Add Context"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+Z",
+        "mac": "Alt+Shift+Z"
+      },
+      "description": "Capture with Context (Popup)"
+    },
+    "quick-capture": {
+      "suggested_key": {
+        "default": "Alt+Shift+A",
+        "mac": "Alt+Shift+A"
+      },
+      "description": "Quick Capture (No Context)"
+    }
+  }
+}
