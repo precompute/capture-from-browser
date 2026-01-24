@@ -1,44 +1,60 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <style>
       body {
-          min-width: 500px;
-          padding: 2px;
+          min-width: 10em;
+          padding: 0.25em;
           font-family: sans-serif;
       }
-      .container {
+      .vcontainer {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 0.25em;
+          font-size: 1em;
       }
-
-      label { font-size: 12px; font-weight: bold; color: gray; }
+      .hcontainer {
+          display: flex;
+          flex-direction: row;
+          gap: 0.25em;
+          height: 2em;
+      }
 
       textarea {
           width: 100%;
-          min-height: 180px;
+          min-height: 10em;
           resize: both;
-          padding: 5px;
+          padding: 0.125em;
           box-sizing: border-box;
       }
 
       button {
-          padding: 8px;
+          padding: 0.125em 0.75em;
           border: none;
           cursor: pointer;
-          font-weight: bold;
+          border-radius: 0.125em;
+          transition: opacity 0.1s;
+          font-size: 1.25em;
+          height: 100%;
+          flex-grow: 4;
+      }
+      .statusdot {
+          flex-grow: 1;
+          height: 100%;
+          background-color: blue;
       }
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="vcontainer">
       <div>
-        <label for="context"></label>
         <textarea id="context"></textarea>
       </div>
-
-      <button id="send-btn">Capture</button>
+      <div class="hcontainer">
+        <button id="capture-btn">Capture</button>
+        <div id="status-dot" class="statusdot"></div>
+    </div>
     </div>
     <script src="popup.js"></script>
   </body>

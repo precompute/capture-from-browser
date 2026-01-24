@@ -1,10 +1,20 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     const contextInput = document.getElementById("context");
-    const sendBtn = document.getElementById("send-btn");
+    const sendBtn = document.getElementById("capture-btn");
+    const statusDot = document.getElementById("status-dot");
 
     let captureData = null;
-    captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
+    try {
+        captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
+        if (captureData.selection_text) {
+            statusDot.style.backgroundColor = "green";
+        } else {
+            statusDot.style.backgroundColor = "yellow";
+        }
+    } catch (e) {
+            statusDot.style.backgroundColor = "red";
+    }
 
     const handleSend = async () => {
         if (!captureData) return;
