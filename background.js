@@ -4,22 +4,43 @@ chrome.commands.onCommand.addListener((command) => {
     }
 });
 
+const DEFAULT_ICON = {
+    "16": "/icons/icon16.png",
+    "48": "/icons/icon48.png",
+    "128": "/icons/icon128.png"
+}
+async function setVisualStatus(tabId, success) {
+    const icon = success ? "/icons/success.png" : "/icons/error.png";
+    try {
+        chrome.action.setIcon({
+            path: icon,
+            tabId: tabId
+        });
+    } catch (e) {
+        console.warn("Couldn't change icon.", e);
+    }
+}
 async function performQuickCapture() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab) return;
     try {
         const data = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
         await sendToBackend(data, "");
-        chrome.action.setBadgeText({text: "OK", tabID: tab.id});
-        chrome.action.setBadgeBackgroundColor({color: "green", tabID: tab.id});
+        await setVisualStatus(tab.id, true);
     } catch (err) {
         console.error(err);
-        chrome.action.setBadgeText({ text: "ERR", tabID: tab.id });
-        chrome.action.setBadgeBackgroundColor({ color: "red", tabID: tab.id });
+        await setVisualStatus(tab.id, false);
     }
     setTimeout(() => {
-        chrome.action.setBadgeText({ text: "", tabID: tab.id });
-    }, 1500);
+        try {
+            chrome.action.setIcon({
+                tabId: tab.id,
+                path: DEFAULT_ICON
+            });
+        } catch (e) {
+            console.warn("Couldn't change icon to original.", e);
+        }
+    }, 500);
 }
 
 async function sendToBackend(data, context) {

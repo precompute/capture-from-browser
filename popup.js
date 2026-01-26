@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
         if (captureData.selection_text) {
             const wordCount = captureData.selection_text.trim().split(/\s+/).length;
-            captureButton.textContent = `Capture (${wordCount}w)`;
+            captureButton.textContent = `Capture ${wordCount}w`;
             captureButton.style.color = "green";
         } else {
             captureButton.textContent = "Capture";
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
                 captureButton.textContent = "Server Error";
                 captureButton.style.color = "red";
-                throw new error("Is the server up?")
+                throw new Error("Is the server up?")
             }
         } catch (err) {
             captureButton.textContent = "Connection Failed";
