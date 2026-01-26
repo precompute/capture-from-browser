@@ -8,21 +8,22 @@ Features:
 - Markdown toggle (boolean flag sent to backend)
 - Keyboard shortcuts
 - Textbox for additional context
-- Easily readable (hopefully)
+
+#+HTML: <img src="screenshot.webp" align="center">
 
 Inspired by [[https://github.com/karlicoss/grasp][Grasp]], which is an excellent extension that I have used for years.
 
 
 ** Using The Extension
 You’ll need to load it manually.
-In Firefox, you need Nightly.  Toggle =xpinstall.signatures.required= (and maybe =xpinstall.whitelist.required= too).
-Then open =about:debugging= and load the =manifest.json= file by clicking on the "Load Temporary Add-On" in the "This Nightly" section.
+For Firefox, you need the Nightly version.  Toggle =xpinstall.signatures.required= (and maybe =xpinstall.whitelist.required= too).
+Then open =about:debugging= and load the =manifest.json= file by clicking on the "Load Temporary Add-On" button in the "This Nightly" section.
 
 Default keybinds:
 - M-S-a :: Quick Capture
 - M-S-z :: Capture with Context (opens popup)
 
-You can change the default keybinds if necessary.
+You can change the default keybinds if you want.
 
 ** The Backend Server
 This extension requires a backend server running on the port the extension sends data to.  This server is responsible for parsing and printing the data.  The extension is "dumb", it just sends data.
