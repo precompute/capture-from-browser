@@ -1,4 +1,4 @@
-* Capture-to-file
+* Capture-from-browser
 This is a Web Extension (Firefox / Chrome / Chromium / Brave) that extracts the current title, url and highlighted text and sends it to a local server.
 Features:
 - Easily change default port
