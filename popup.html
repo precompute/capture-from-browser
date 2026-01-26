@@ -3,10 +3,16 @@
   <head>
     <meta charset="UTF-8">
     <style>
+      :root {
+          --font: Helvetica, Inter, sans-serif;
+      }
       body {
           min-width: 10em;
           padding: 0.25em;
-          font-family: sans-serif;
+          padding-bottom: 0;
+          font-family: var(--font);
+          background-color: black;
+          color: white;
       }
       .vcontainer {
           display: flex;
@@ -20,29 +26,65 @@
           gap: 0.25em;
           height: 2em;
       }
-
       textarea {
           width: 100%;
           min-height: 10em;
+          min-width: 32em;
           resize: both;
           padding: 0.125em;
           box-sizing: border-box;
+          background-color: black;
+          color: white;
+          font-family: var(--font);
       }
-
+      textarea:focus {
+          outline: none;
+          border: none;
+      }
       button {
-          padding: 0.125em 0.75em;
+          padding: 0.125em 0.5em;
           border: none;
           cursor: pointer;
           border-radius: 0.125em;
           transition: opacity 0.1s;
-          font-size: 1.25em;
+          color: white;
+          background-color: black;
           height: 100%;
+      }
+      button:hover {
+          background-color: #050505;
+      }
+      .capturebutton {
+          font-size: 1em;
           flex-grow: 4;
       }
-      .statusdot {
+      .markdownbutton {
           flex-grow: 1;
-          height: 100%;
-          background-color: blue;
+      }
+      .portinput {
+          padding: 0.125em 0.75em;
+          border: 0.2em solid gray;
+          border-radius: 0.125em;
+          font-family: var(--font);
+          box-sizing: border-box;
+          cursor: text;
+          background-color: black;
+          color: white;
+          border: none;
+          width: 10ch;
+          text-align: center;
+      }
+      .portinput:focus {
+          outline: none;
+
+      }
+      .portinput::-webkit-outer-spin-button,
+      .portinput::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+      }
+      .portinput[type=number] {
+          -moz-appearance: textfield;
       }
     </style>
   </head>
@@ -52,9 +94,10 @@
         <textarea id="context"></textarea>
       </div>
       <div class="hcontainer">
-        <button id="capture-btn">Capture</button>
-        <div id="status-dot" class="statusdot"></div>
-    </div>
+        <button id="capture-button" class="capturebutton">Capture</button>
+        <button id="markdown-button" class="markdownbutton">MD</button>
+        <input id="port-input" class="portinput" type="number" value="18080">
+      </div>
     </div>
     <script src="popup.js"></script>
   </body>
