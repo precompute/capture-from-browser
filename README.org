@@ -1,4 +1,7 @@
-* Capture-from-browser
+#+TITLE: Capture From Browser
+
+#+HTML: <img src="logo.png" align="center">
+
 This is a Web Extension (Firefox / Chrome / Chromium / Brave) that extracts the current title, url and highlighted text and sends it to a local server.
 Features:
 - Easily change default port
@@ -8,4 +11,62 @@ Features:
 - Easily readable (hopefully)
 
 Inspired by [[https://github.com/karlicoss/grasp][Grasp]], which is an excellent extension that I have used for years.
+
+
+** Using The Extension
+You’ll need to load it manually.
+In Firefox, you need Nightly.  Toggle =xpinstall.signatures.required= (and maybe =xpinstall.whitelist.required= too).
+Then open =about:debugging= and load the =manifest.json= file by clicking on the "Load Temporary Add-On" in the "This Nightly" section.
+
+Default keybinds:
+- M-S-a :: Quick Capture
+- M-S-z :: Capture with Context (opens popup)
+
+You can change the default keybinds if necessary.
+
+** The Backend Server
+This extension requires a backend server running on the port the extension sends data to.  This server is responsible for parsing and printing the data.  The extension is "dumb", it just sends data.
+
+The extension returns JSON, so you can write your own server.
+#+BEGIN_SRC
+$ nc -l -p 18080
+POST /api/capture HTTP/1.1
+Host: localhost:18080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0
+Accept: */*
+Accept-Language: en-US,en;q=0.9
+Accept-Encoding: gzip, deflate, br, zstd
+Content-Type: application/json
+Content-Length: 1484
+Origin: moz-extension://b727f83f-a161-4b5d-89cf-8cedc60a020d
+Connection: keep-alive
+Sec-Fetch-Dest: empty
+Sec-Fetch-Mode: cors
+Sec-Fetch-Site: same-origin
+Idempotency-Key: "12102151295200508430"
+Priority: u=4
+#+END_SRC
+#+BEGIN_SRC json
+{
+  "source_url": "https://go.dev/blog/json",
+  "page_title": "JSON and Go - The Go Programming Language",
+  "selection_text": "\nJSON and Go\n\nAndrew Gerrand\n25 January 2011\nIntroduction¶\n\nJSON (JavaScript Object Notation) is a simple data interchange format. Syntactically it resembles the objects and lists of JavaScript. It is most commonly used for communication between web back-ends and JavaScript programs running in the browser, but it is used in many other places, too. Its home page, json.org, provides a wonderfully clear and concise definition of the standard.",
+  "selection_html": "<h1 class=\"small\"><a href=\"/blog/\"></a></h1>\n    \n\n    <h1>JSON and Go</h1>\n      \n      <p class=\"author\">\n      Andrew Gerrand<br>\n      25 January 2011\n      </p>\n      \n      <div class=\"markdown\">\n<h2 id=\"introduction\">Introduction<a href=\"#introduction\" class=\"Article-idLink\" aria-label=\"Go to introduction\">¶</a></h2>\n<p>JSON (JavaScript Object Notation) is a simple data interchange format.\nSyntactically it resembles the objects and lists of JavaScript.\nIt is most commonly used for communication between web back-ends and JavaScript\nprograms running in the browser,\nbut it is used in many other places, too.\nIts home page, <a href=\"http://json.org\" rel=\"noreferrer\" target=\"_blank\">json.org</a>,\nprovides a wonderfully clear and concise definition of the standard.</p></div>",
+  "context": "",
+  "markdown": false,
+  "timestamp": "2026-01-26T19:26:09.406Z"
+}
+
+#+END_SRC
+Note that markdown is of type bool.  The extension does not convert to markdown, that must be done by the backend server (with the contents of =selection_html=).
+
+*** Included Server (golang)
+For ease of use, a simple server written in golang is included.  This server takes three arguments:
+- -o :: File to output to
+- -p :: Port to listen on
+- -f :: Output Format.  In lieu of complicated parsing, we use the syntax that [[https://pkg.go.dev/os#Expand][os.Expand]] understands.
+  #+BEGIN_QUOTE https://pkg.go.dev/os#Expand
+Expand replaces ${var} or $var in the string based on the mapping function. For example, os.ExpandEnv(s) is equivalent to os.Expand(s, os.Getenv). 
+  #+END_QUOTE
+
 
