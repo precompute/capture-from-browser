@@ -78,10 +78,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (res.ok) {
                 captureButton.textContent = "Saved!";
                 captureButton.style.color = "green";
+                chrome.runtime.sendMessage({
+                    action: "FLASH_ICON",
+                    tabId: tab.id,
+                    success: true
+                });
                 setTimeout(() => window.close(), 100);
             } else {
                 captureButton.textContent = "Server Error";
                 captureButton.style.color = "red";
+                chrome.runtime.sendMessage({
+                    action: "FLASH_ICON",
+                    tabId: tab.id,
+                    success: false
+                });
                 throw new Error("Is the server up?")
             }
         } catch (err) {

@@ -3,6 +3,11 @@ chrome.commands.onCommand.addListener((command) => {
         performQuickCapture();
     }
 });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if(request.action === "FLASH_ICON") {
+        setVisualStatus(request.tabId, request.success);
+    }
+});
 
 const DEFAULT_ICON = {
     "16": "/icons/icon16.png",
@@ -16,6 +21,16 @@ async function setVisualStatus(tabId, success) {
             path: icon,
             tabId: tabId
         });
+        setTimeout(() => {
+            try {
+                chrome.action.setIcon({
+                    tabId: tabId,
+                    path: DEFAULT_ICON
+                });
+            } catch (e) {
+                console.warn("Couldn't change icon to original.", e);
+            }
+        }, 500);
     } catch (e) {
         console.warn("Couldn't change icon.", e);
     }
@@ -31,16 +46,6 @@ async function performQuickCapture() {
         console.error(err);
         await setVisualStatus(tab.id, false);
     }
-    setTimeout(() => {
-        try {
-            chrome.action.setIcon({
-                tabId: tab.id,
-                path: DEFAULT_ICON
-            });
-        } catch (e) {
-            console.warn("Couldn't change icon to original.", e);
-        }
-    }, 500);
 }
 
 async function sendToBackend(data, context) {
