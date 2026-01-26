@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 )
@@ -24,9 +25,30 @@ type ReceivedData struct {
 }
 
 type confFlags struct {
-	port         string
-	outputFile   string
-	outputFormat string
+	port                 string
+	outputFile           string
+	outputFormat         string
+	outputFormatMarkdown string
+}
+
+func htmlToMD(htmlInput string, fallback string) string {
+	_, err := exec.LookPath("pandoc")
+	if err == nil {
+		cmd := exec.Command("pandoc", "-f", "html-native_divs-native_spans",
+			"-t", "markdown-raw_html+backtick_code_blocks-native_divs-native_spans+pipe_tables",
+			"--wrap=none")
+		cmd.Stdin = strings.NewReader(htmlInput)
+		out, err := cmd.Output()
+		if err == nil {
+			return string(out)
+		} else {
+			log.Printf("Pandoc Error: %v", err)
+			return fallback
+		}
+	} else {
+		log.Printf("Could not find Pandoc: %v", err)
+		return fallback
+	}
 }
 
 func captureHandler(writer http.ResponseWriter, req *http.Request, cf confFlags) {
@@ -49,7 +71,14 @@ func captureHandler(writer http.ResponseWriter, req *http.Request, cf confFlags)
 		return
 	}
 
-	outString := os.Expand(cf.outputFormat, func(z string) string {
+	format := ""
+	if recdata.Markdown && cf.outputFormatMarkdown != "" {
+		format = cf.outputFormatMarkdown
+	} else {
+		format = cf.outputFormat
+	}
+
+	outString := os.Expand(format, func(z string) string {
 		switch z {
 		case "SourceURL":
 			return recdata.SourceURL
@@ -60,14 +89,14 @@ func captureHandler(writer http.ResponseWriter, req *http.Request, cf confFlags)
 		case "Context":
 			return recdata.Context
 		case "Timestamp":
-			return recdata.Timestamp.Format("2000-01-01 00:00:00")
+			return recdata.Timestamp.Local().Format("[06-01-02 15:04:05]")
 		case "PageTitle":
 			return recdata.PageTitle
 		case "SelectionMD":
-			return recdata.SelectionMD
+			return htmlToMD(recdata.SelectionHTML, recdata.SelectionText)
 		case "SelectionDWIM":
 			if recdata.Markdown {
-				return recdata.SelectionHTML
+				return htmlToMD(recdata.SelectionHTML, recdata.SelectionText)
 			} else {
 				return recdata.SelectionText
 			}
@@ -82,12 +111,12 @@ func captureHandler(writer http.ResponseWriter, req *http.Request, cf confFlags)
 	if err == nil {
 		defer outfile.Close()
 		outfile.WriteString(outString)
+		// log.Printf("Timestamp %s\n%s", recdata.Timestamp.Local(), outString)
 	} else {
 		log.Println("Couldn't write to file", err)
 	}
 
 	writer.WriteHeader(http.StatusOK)
-	fmt.Fprint(writer, "Captured Successfully")
 }
 
 func main() {
@@ -107,6 +136,7 @@ $SelectionMD: Selected HTML converted to Markdown
 $SelectionDWIM: Do What I Mean: Markdown if the Markdown flag is set on the server, plain text otherwise.
 \n: Newline
 `)
+	flag.StringVar(&cf.outputFormatMarkdown, "m", "", "Same as -f, but for markdown (if present).")
 	flag.Parse()
 
 	http.HandleFunc("/api/capture", func(w http.ResponseWriter, r *http.Request) {
