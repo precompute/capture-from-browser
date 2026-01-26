@@ -1,0 +1,11 @@
+* Capture-to-file
+This is a Web Extension (Firefox / Chrome / Chromium / Brave) that extracts the current title, url and highlighted text and sends it to a local server.
+Features:
+- Easily change default port
+- Markdown toggle (boolean flag sent to backend)
+- Keyboard shortcuts
+- Textbox for additional context
+- Easily readable (hopefully)
+
+Inspired by [[https://github.com/karlicoss/grasp][Grasp]], which is an excellent extension that I have used for years.
+
