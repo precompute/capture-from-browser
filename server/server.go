@@ -100,15 +100,20 @@ func captureHandler(writer http.ResponseWriter, req *http.Request, cf confFlags)
 				return formatMap("SelectionText")
 			}
 		case "SelectionTextBlock":
-			return "\n#+begin_quote\n" + formatMap("SelectionText") + "\n#+end_quote"
-		case "SelectionMdBlock":
-			return "\n#+begin_src markdown\n" + formatMap("SelectionText") + "\n#+end_src"
+			if t := formatMap("SelectionText"); t != "" {
+				return "\\n#+begin_quote\\n" + t + "\\n#+end_quote"
+			}
+			return ""
+		case "SelectionMDBlock":
+			if t := formatMap("SelectionMD"); t != "" {
+				return "\\n#+begin_src markdown\\n" + t + "\\n#+end_src"
+			}
+			return ""
 		case "SelectionDWIMBlock":
 			if recdata.Markdown {
 				return formatMap("SelectionMDBlock")
-			} else {
-				return formatMap("SelectionText")
 			}
+			return formatMap("SelectionTextBlock")
 		default:
 			return ""
 		}
@@ -133,7 +138,7 @@ func main() {
 	flag.StringVar(&cf.port, "p", "18080", "Port")
 	flag.StringVar(&cf.outputFile, "o", "/tmp/capture.txt", "File to print text to")
 	flag.StringVar(&cf.outputFormat, "f",
-		"\n** ${PageTitle}\n${SourceURL}\n${Timestamp}\n#+begin_quote\n${SelectionDWIM}\n#+end_quote\n${Context}",
+		"\n\n** ${PageTitle}\n${SourceURL}\n${Timestamp}${SelectionDWIMBlock}\n${Context}",
 		`Output format.  Uses $var for variables.  Allowed variables:
 $SourceURL: URL of the captured page
 $SelectionText: Selected Text
