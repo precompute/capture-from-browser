@@ -91,11 +91,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     chrome.runtime.sendMessage({
       action: "SEND_DATA",
       tabId: tab.id,
+      tabUrl: tab.url,
       data: captureData,
       context: contextInput.value
     }, (response) => {
       captureButton.disabled = false;
       if (response?.success) {
+        contextInput.value = "";
         chrome.storage.local.remove("saved_context");
         window.close();
       } else {

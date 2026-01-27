@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if(request.action === "SEND_DATA") {
     (async () => {
       try {
-        await sendToBackend(request.tabId, request.data, request.context);
+        await sendToBackend(request.tabId, request.tabUrl, request.data, request.context);
         sendResponse({
           success: true
         });
@@ -54,20 +54,20 @@ async function setVisualStatus(tabId, status, delay=1000) {
 // *** Perform Quick Capture
 async function performQuickCapture() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  const protocol = new URL(tab.url).protocol;
-  if(!['http:', 'https:', 'file:'].includes(protocol)) {
-    return;
-  }
   try {
     const data = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
-    await sendToBackend(tab.id, data, "");
+    await sendToBackend(tab.id, tab.url, data, "");
   } catch (err) {
     console.error(err);
     await setVisualStatus(tab.id, false, 5000);
   }
 }
 // *** Send Data to Backend
-async function sendToBackend(tabId, data, context) {
+async function sendToBackend(tabId, tabUrl, data, context) {
+  const protocol = new URL(tabUrl).protocol;
+  if(!['http:', 'https:', 'file:'].includes(protocol)) {
+    return;
+  }
   const {server_port, use_markdown}= await chrome.storage.local.get({
     server_port: "18080",
     use_markdown: false
