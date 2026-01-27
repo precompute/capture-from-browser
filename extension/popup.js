@@ -1,3 +1,4 @@
+// * Popup (GUI)
 document.addEventListener("DOMContentLoaded", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const contextInput = document.getElementById("context");
@@ -5,17 +6,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   const markdownButton = document.getElementById("markdown-button");
   const portInput = document.getElementById("port-input");
   const protocol = new URL(tab.url).protocol;
+  // ** Check for invalid URLs
   if(!['http:', 'https:', 'file:'].includes(protocol)) {
     captureButton.disabled = true;
     captureButton.textContent = "Restricted URL";
     return;
   }
 
+  // ** Close Popup on tab change
   chrome.tabs.onActivated.addListener(() => {
     window.close();
   })
 
-  let captureData = null;
+  // ** Load data from local storage
   let settings = await chrome.storage.local.get({
     saved_server_port: "18080",
     use_markdown: false,
@@ -26,6 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   contextInput.value = settings.saved_context;
   updateMarkdownButton(settings.use_markdown);
 
+  // *** Save inputarea text
   const saveContextInput = () => {
     chrome.storage.local.set({
       saved_context: contextInput.value
@@ -34,6 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   contextInput.addEventListener("blur", saveContextInput);
   window.addEventListener("blur", saveContextInput);
 
+  // *** Validate and save port
   function validPort(val) {
     const port = parseInt(val, 10);
     return !isNaN(port) && port > 0 && port <= 65535;
@@ -48,6 +53,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  // *** Save and show Markdown status
+  markdownButton.addEventListener("click", () => {
+    settings.use_markdown = !settings.use_markdown;
+    chrome.storage.local.set({
+      use_markdown: settings.use_markdown
+    });
+    updateMarkdownButton(settings.use_markdown);
+  });
+  function updateMarkdownButton(enabled) {
+    markdownButton.style.color = enabled ? "green" : "red";
+    markdownButton.innerHTML = enabled ? "✔Markdown" : "✘Markdown";
+  }
+
+  // ** Get Data from page
+  let captureData = null;
   try {
     captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
     if (captureData?.selection_text) {
@@ -64,19 +84,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error(e);
   }
 
-  markdownButton.addEventListener("click", () => {
-    settings.use_markdown = !settings.use_markdown;
-    chrome.storage.local.set({
-      use_markdown: settings.use_markdown
-    });
-    updateMarkdownButton(settings.use_markdown);
-  });
-
-  function updateMarkdownButton(enabled) {
-    markdownButton.style.color = enabled ? "green" : "red";
-    markdownButton.innerHTML = enabled ? "✔Markdown" : "✘Markdown";
-  }
-
+  // ** Send Data
   const handleSend = async () => {
     if (!captureData) return;
     captureButton.disabled = true;
@@ -97,6 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   };
 
+  // *** Keybinds for sending data
   captureButton.addEventListener("click", handleSend);
 
   contextInput.addEventListener("keydown", (e) => {

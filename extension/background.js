@@ -1,8 +1,12 @@
+// * Background Service
+// ** Listeners
+// *** Quick Capture
 chrome.commands.onCommand.addListener((command) => {
   if (command === "quick-capture") {
     performQuickCapture();
   }
 });
+// *** Requests for sending data to the backend
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if(request.action === "SEND_DATA") {
     (async () => {
@@ -22,6 +26,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+// ** Manage icons according to state
 const DEFAULT_ICON = {
   "16": "/icons/icon16.png",
   "48": "/icons/icon48.png",
@@ -44,13 +49,13 @@ async function setVisualStatus(tabId, status, delay=1000) {
     console.warn("Couldn't change icon.", e);
   }
 }
+
+// ** Functions
+// *** Perform Quick Capture
 async function performQuickCapture() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const protocol = new URL(tab.url).protocol;
   if(!['http:', 'https:', 'file:'].includes(protocol)) {
-    const captureButton = document.getElementById("capture-button");
-    captureButton.disabled = true;
-    captureButton.textContent = "Restricted URL";
     return;
   }
   try {
@@ -61,6 +66,7 @@ async function performQuickCapture() {
     await setVisualStatus(tab.id, false, 5000);
   }
 }
+// *** Send Data to Backend
 async function sendToBackend(tabId, data, context) {
   const {server_port, use_markdown}= await chrome.storage.local.get({
     server_port: "18080",
@@ -77,9 +83,10 @@ async function sendToBackend(tabId, data, context) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });
-  if (response.ok) {
+  if (response?.ok) {
     await setVisualStatus(tabId, true);
   } else {
+    console.warn(response);
     throw new Error("Server error");
   }
 }
