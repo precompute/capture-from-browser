@@ -4,8 +4,21 @@ chrome.commands.onCommand.addListener((command) => {
     }
 });
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if(request.action === "FLASH_ICON") {
-        setVisualStatus(request.tabId, request.success);
+    if(request.action === "SEND_DATA") {
+        (async () => {
+            try {
+                await sendToBackend(request.tabId, request.data, request.context);
+                sendResponse({
+                    success: true
+                });
+            } catch(e) {
+                sendResponse({
+                    success: false,
+                    error: e.message
+                });
+            }
+        })();
+        return true;
     }
 });
 
@@ -14,14 +27,16 @@ const DEFAULT_ICON = {
     "48": "/icons/icon48.png",
     "128": "/icons/icon128.png"
 }
-async function setVisualStatus(tabId, success) {
-    const icon = success ? "/icons/success.png" : "/icons/error.png";
+let iconTimer = null;
+async function setVisualStatus(tabId, status, delay=2000) {
+    const icon = status ? "/icons/success.png" :  "/icons/error.png";
+    if (iconTimer) clearTimeout(iconTimer);
     try {
         chrome.action.setIcon({
             path: icon,
             tabId: tabId
         });
-        setTimeout(() => {
+        iconTimer = setTimeout(() => {
             try {
                 chrome.action.setIcon({
                     tabId: tabId,
@@ -30,7 +45,7 @@ async function setVisualStatus(tabId, success) {
             } catch (e) {
                 console.warn("Couldn't change icon to original.", e);
             }
-        }, 500);
+        }, delay);
     } catch (e) {
         console.warn("Couldn't change icon.", e);
     }
@@ -40,29 +55,31 @@ async function performQuickCapture() {
     if (!tab) return;
     try {
         const data = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
-        await sendToBackend(data, "");
-        await setVisualStatus(tab.id, true);
+        await sendToBackend(tab.id, data, "");
     } catch (err) {
         console.error(err);
-        await setVisualStatus(tab.id, false);
+        await setVisualStatus(tab.id, false, 5000);
     }
 }
-
-async function sendToBackend(data, context) {
-    const settings = await chrome.storage.local.get({
+async function sendToBackend(tabId, data, context) {
+    const {server_port, use_markdown}= await chrome.storage.local.get({
         server_port: "18080",
         use_markdown: false
     });
     const payload = {
         ...data,
         context: context,
-        markdown: settings.use_markdown,
+        markdown: use_markdown,
         timestamp: new Date().toISOString()
     };
-    const response = await fetch(`http://localhost:${settings.server_port}/api/capture`, {
+    const response = await fetch(`http://localhost:${server_port}/api/capture`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
     });
-    if (!response.ok) throw new Error("Server error");
+    if (response.ok) {
+        await setVisualStatus(tabId, true);
+    } else {
+        throw new Error("Server error");
+    }
 }

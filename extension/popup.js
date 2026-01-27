@@ -50,55 +50,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const handleSend = async () => {
         if (!captureData) return;
-
-        captureButton.textContent = "Capturing";
-
-        const currentSettings = await chrome.storage.local.get({
-            server_port: "18080",
-            use_markdown: false
-        });
-
-        const port = currentSettings.server_port;
-        const context = contextInput.value;
-
-        const payload = {
-            ...captureData,
-            context: context,
-            markdown: currentSettings.use_markdown,
-            timestamp: new Date().toISOString()
-        };
-
-        try {
-            const res = await fetch(`http://localhost:${port}/api/capture`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                captureButton.textContent = "Saved!";
-                captureButton.style.color = "green";
-                chrome.runtime.sendMessage({
-                    action: "FLASH_ICON",
-                    tabId: tab.id,
-                    success: true
-                });
-                setTimeout(() => window.close(), 100);
-            } else {
+        chrome.runtime.sendMessage({
+            action: "SEND_DATA",
+            tabId: tab.id,
+            data: captureData,
+            context: contextInput.value
+        }, (response) => {
+            if (chrome.runtime.lastError || !response || !response.success) {
                 captureButton.textContent = "Server Error";
                 captureButton.style.color = "red";
-                chrome.runtime.sendMessage({
-                    action: "FLASH_ICON",
-                    tabId: tab.id,
-                    success: false
-                });
-                throw new Error("Is the server up?")
+                throw new Error("Is the server up?");
+            } else {
+                window.close();
             }
-        } catch (err) {
-            captureButton.textContent = "Connection Failed";
-            captureButton.style.color = "red";
-            console.error(err);
-        }
+        });
     };
 
     captureButton.addEventListener("click", handleSend);
