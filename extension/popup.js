@@ -17,12 +17,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let captureData = null;
   let settings = await chrome.storage.local.get({
-    server_port: "18080",
-    use_markdown: false
+    saved_server_port: "18080",
+    use_markdown: false,
+    saved_context: ""
   })
 
-  portInput.value = settings.server_port;
+  portInput.value = settings.saved_server_port;
+  contextInput.value = settings.saved_context;
   updateMarkdownButton(settings.use_markdown);
+
+  contextInput.addEventListener("input", () => {
+    chrome.storage.local.set({
+      saved_context: contextInput.value
+    });
+  });
 
   function validPort(val) {
     const port = parseInt(val, 10);
@@ -33,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     portInput.style.backgroundColor = valid ? "black" : "rgba(255,0,0,0.1)";
     if (valid) {
       chrome.storage.local.set({
-        server_port: portInput.value
+        saved_server_port: portInput.value
       });
     }
   });
@@ -78,6 +86,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, (response) => {
       captureButton.disabled = false;
       if (response?.success) {
+        chrome.storage.local.remove("saved_context");
         window.close();
       } else {
         captureButton.textContent = "Server Error";
