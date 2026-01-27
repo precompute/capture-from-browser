@@ -20,8 +20,6 @@ type ReceivedData struct {
 	Timestamp     time.Time `json:"timestamp"`
 	Markdown      bool      `json:"markdown"`
 	PageTitle     string    `json:"page_title"`
-	SelectionMD   string    `json:"-"`
-	SelectionDWIM string    `json:"-"`
 }
 
 type confFlags struct {
@@ -78,7 +76,8 @@ func captureHandler(writer http.ResponseWriter, req *http.Request, cf confFlags)
 		format = cf.outputFormat
 	}
 
-	outString := os.Expand(format, func(z string) string {
+	var formatMap func(string) string
+	formatMap = func(z string) string {
 		switch z {
 		case "SourceURL":
 			return recdata.SourceURL
@@ -96,15 +95,25 @@ func captureHandler(writer http.ResponseWriter, req *http.Request, cf confFlags)
 			return htmlToMD(recdata.SelectionHTML, recdata.SelectionText)
 		case "SelectionDWIM":
 			if recdata.Markdown {
-				return htmlToMD(recdata.SelectionHTML, recdata.SelectionText)
+				return formatMap("SelectionMD")
 			} else {
-				return recdata.SelectionText
+				return formatMap("SelectionText")
+			}
+		case "SelectionTextBlock":
+			return "\n#+begin_quote\n" + formatMap("SelectionText") + "\n#+end_quote"
+		case "SelectionMdBlock":
+			return "\n#+begin_src markdown\n" + formatMap("SelectionText") + "\n#+end_src"
+		case "SelectionDWIMBlock":
+			if recdata.Markdown {
+				return formatMap("SelectionMDBlock")
+			} else {
+				return formatMap("SelectionText")
 			}
 		default:
 			return ""
 		}
-
-	})
+	}
+	outString := os.Expand(format, formatMap)
 	outString = strings.ReplaceAll(outString, "\\n", "\n")
 
 	outfile, err := os.OpenFile(cf.outputFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -124,7 +133,7 @@ func main() {
 	flag.StringVar(&cf.port, "p", "18080", "Port")
 	flag.StringVar(&cf.outputFile, "o", "/tmp/capture.txt", "File to print text to")
 	flag.StringVar(&cf.outputFormat, "f",
-		"\n** $PageTitle\n$SourceURL\n$Timestamp\n#+begin_quote\n$SelectionDWIM\n#+end_quote\n$Context",
+		"\n** ${PageTitle}\n${SourceURL}\n${Timestamp}\n#+begin_quote\n${SelectionDWIM}\n#+end_quote\n${Context}",
 		`Output format.  Uses $var for variables.  Allowed variables:
 $SourceURL: URL of the captured page
 $SelectionText: Selected Text
@@ -134,6 +143,9 @@ $Timestamp: Capture Time
 $PageTitle: Title of captured page
 $SelectionMD: Selected HTML converted to Markdown
 $SelectionDWIM: Do What I Mean: Markdown if the Markdown flag is set on the server, plain text otherwise.
+$SelectionTextBlock: Same as SelectionText, but with org-mode blocks.
+$SelectionMDBlock: Same as SelectionMD, but with org-mode blocks.
+$SelectionDWIMBlock: Same as SelectionDWIM, but with org-mode blocks.
 \n: Newline
 `)
 	flag.StringVar(&cf.outputFormatMarkdown, "m", "", "Same as -f, but for markdown (if present).")
