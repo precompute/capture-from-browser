@@ -26,11 +26,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   contextInput.value = settings.saved_context;
   updateMarkdownButton(settings.use_markdown);
 
-  contextInput.addEventListener("input", () => {
+  const saveContextInput = () => {
     chrome.storage.local.set({
       saved_context: contextInput.value
     });
-  });
+  };
+  contextInput.addEventListener("blur", saveContextInput);
+  window.addEventListener("blur", saveContextInput);
 
   function validPort(val) {
     const port = parseInt(val, 10);
