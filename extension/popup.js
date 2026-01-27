@@ -4,6 +4,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const captureButton = document.getElementById("capture-button");
     const markdownButton = document.getElementById("markdown-button");
     const portInput = document.getElementById("port-input");
+    const protocol = new URL(tab.url).protocol;
+    if(!['http:', 'https:', 'file:'].includes(protocol)) {
+        captureButton.disabled = true;
+        captureButton.textContent = "Restricted URL";
+        return;
+    }
+
+    chrome.tabs.onActivated.addListener(() => {
+        window.close();
+    })
 
     let captureData = null;
     let settings = await chrome.storage.local.get({
@@ -14,9 +24,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     portInput.value = settings.server_port;
     updateMarkdownButton(settings.use_markdown);
 
+    function validPort(val) {
+        const port = parseInt(val, 10);
+        return !isNaN(port) && port > 0 && port <= 65535;
+    }
+    portInput.addEventListener("input", () => {
+        const valid = validPort(portInput.value);
+        portInput.style.backgroundColor = valid ? "black" : "rgba(255,0,0,0.1)";
+        if (valid) {
+            chrome.storage.local.set({
+                server_port: portInput.value
+            });
+        }
+    });
+
     try {
         captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
-        if (captureData.selection_text) {
+        if (captureData?.selection_text) {
             const wordCount = captureData.selection_text.trim().split(/\s+/).length;
             captureButton.textContent = `Capture ${wordCount}w`;
             captureButton.style.color = "green";
@@ -25,16 +49,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             captureButton.style.color = "yellow";
         }
     } catch (e) {
-        captureButton.textContent = "N/A";
+        captureButton.textContent = "No Capture Data";
         captureButton.disabled = true;
         console.error(e);
     }
-
-    portInput.addEventListener("change", () => {
-        chrome.storage.local.set({
-            server_port: portInput.value
-        });
-    });
 
     markdownButton.addEventListener("click", () => {
         settings.use_markdown = !settings.use_markdown;
@@ -46,22 +64,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function updateMarkdownButton(enabled) {
         markdownButton.style.color = enabled ? "green" : "red";
+        markdownButton.innerHTML = enabled ? "✔Markdown" : "✘Markdown";
     }
 
     const handleSend = async () => {
         if (!captureData) return;
+        captureButton.disabled = true;
         chrome.runtime.sendMessage({
             action: "SEND_DATA",
             tabId: tab.id,
             data: captureData,
             context: contextInput.value
         }, (response) => {
-            if (chrome.runtime.lastError || !response || !response.success) {
+            captureButton.disabled = false;
+            if (response?.success) {
+                window.close();
+            } else {
                 captureButton.textContent = "Server Error";
                 captureButton.style.color = "red";
-                throw new Error("Is the server up?");
-            } else {
-                window.close();
             }
         });
     };

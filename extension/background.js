@@ -27,32 +27,32 @@ const DEFAULT_ICON = {
     "48": "/icons/icon48.png",
     "128": "/icons/icon128.png"
 }
-let iconTimer = null;
-async function setVisualStatus(tabId, status, delay=2000) {
+const sleep = (ms) => new Promise((r) => setTimeout(r,ms));
+async function setVisualStatus(tabId, status, delay=1000) {
     const icon = status ? "/icons/success.png" :  "/icons/error.png";
-    if (iconTimer) clearTimeout(iconTimer);
     try {
         chrome.action.setIcon({
             path: icon,
             tabId: tabId
         });
-        iconTimer = setTimeout(() => {
-            try {
-                chrome.action.setIcon({
-                    tabId: tabId,
-                    path: DEFAULT_ICON
-                });
-            } catch (e) {
-                console.warn("Couldn't change icon to original.", e);
-            }
-        }, delay);
+        await sleep(delay);
+        chrome.action.setIcon({
+            tabId: tabId,
+            path: DEFAULT_ICON
+        });
     } catch (e) {
         console.warn("Couldn't change icon.", e);
     }
 }
 async function performQuickCapture() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab) return;
+    const protocol = new URL(tab.url).protocol;
+    if(!['http:', 'https:', 'file:'].includes(protocol)) {
+        const captureButton = document.getElementById("capture-button");
+        captureButton.disabled = true;
+        captureButton.textContent = "Restricted URL";
+        return;
+    }
     try {
         const data = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
         await sendToBackend(tab.id, data, "");

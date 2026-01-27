@@ -9,6 +9,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const range = selection.getRangeAt(0);
             const container = document.createElement("div");
             container.appendChild(range.cloneContents());
+            container.querySelectorAll('a').forEach(z => {z.href = z.href;});
+            container.querySelectorAll('img').forEach(z => {z.src = z.src;});
             selectedHtml = container.innerHTML;
         }
 
