@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   function updateMarkdownButton(enabled) {
     markdownButton.style.color = enabled ? "green" : "red";
-    markdownButton.innerHTML = enabled ? "✔Markdown" : "✘Markdown";
+    markdownButton.textContent = enabled ? "✔Markdown" : "✘Markdown";
   }
 
   // ** Get Data from page
