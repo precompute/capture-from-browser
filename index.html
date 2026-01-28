@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture From Browser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Mono&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+      * {
+          margin: 0;
+          padding: 0;
+      }
+      :root {
+          --c1: #FF4000;
+          --c2: #1979EA;
+      }
+      body {
+          font-family: 'Inter', sans-serif;
+          /* background-color: #fdf4dc; */
+          background-color: #000;
+          /* color: #000; */
+          color: #ffffff;
+          max-width: 900px;
+          margin: 0 auto;
+          padding: 1em;
+          font-size: 1.1rem;
+          font-optical-sizing: auto;
+          /* background-image: linear-gradient(to bottom, var(--c1), var(--c2)); */
+      }
+      .container {
+          background-color: rgba(255,255,255,0.025);
+          border: solid 0.05em var(--c1);
+          margin: 1em;
+          padding: 0.75em;
+          /*border-radius: 1em;*/
+          max-width: 700px;
+          margin: 0 auto;
+      }
+      .topheader {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+      }
+      h1 {
+          /* background: linear-gradient(90deg, #ff4000, #1969ea); */
+          /* -webkit-background-clip: text; */
+          /* -webkit-text-fill-color: transparent; */
+          /* background-clip: text; */
+          color: var(--c1);
+          background-color: black;
+          /* border: solid 0.1em var(--c2); */
+          border: solid 0.025em var(--c1);
+          /* color: black; */
+          font-size: 3rem;
+          font-weight: 700;
+          padding: 0.1em 0.5em 0.2em 0.5em;
+          text-decoration: underline 5px solid;
+          /* border-top: 5px solid var(--c1); */
+          text-align: center;
+          /*border-radius: 0.25em;*/
+          margin-bottom: 0.5em;
+          /* opacity: 90%; */
+          /* display: inline-block; */
+
+      }
+      h2 {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--c2);
+          /* border-top: 5px solid var(--c1); */
+          margin: 0.1em 0;
+          padding-left: 0.2em;
+      }
+      h2::before {
+          content: "* ";
+          color: var(--c1);
+      }
+      h3 {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--c2);
+          /* border-top: 5px solid var(--c1); */
+          margin: 0.2em 0 0.1em 0;
+          padding-left: 0.2em;
+      }
+      h3::before {
+          content: "** ";
+          color: var(--c1);
+      }
+      .logo {
+          min-width: 10%;
+          border: 0.1em solid var(--c1);
+          padding: 0.1em;
+      }
+      .screenshot {
+          display: block;
+          max-width: 75%;
+          border: 0.25em solid var(--c1);
+          padding: 0.2em;
+          margin: 0 auto;
+      }
+      ul {
+          list-style-type: square;
+          list-style;
+          padding: 0.25em 2em;
+          margin-bottom: 0.5em;
+      }
+      li::marker {
+          color: var(--c1);
+      }
+      p {
+          margin: 0.4em 1em 0 1em;
+      }
+      .blue {
+          color: var(--c2);
+      }
+      .blue::before {
+          content: "+ ";
+      }
+      pre {
+          /* background: rgba(255,255,255,0.5); */
+          padding-top: 1em;
+          overflow-x: auto;
+          font-size: 1.1rem;
+          border-radius: 0;
+          border-radius: 0.25em;
+          font-family: 'Fira Mono', monospace;
+      }
+      .keybind {
+          background: var(--c1);
+          color: white;
+          font-family: 'Fira Mono', monospace;
+          padding: 0 0.25em;
+      }
+      .repolink {
+          margin: 0 auto;
+      }
+      .indented {
+          margin: 0 0.75em;
+      }
+      .repolink {
+          color: black;
+          font-size: 1.75em;
+          border: solid 0.1em var(--c1);
+          padding: 0.1em 0.25em;
+          margin: 0.1em 0;
+          background-color: var(--c1);
+          display: inline-block;
+          text-align: center;
+      }
+      .repolink:hover {
+          border: solid 0.1em var(--c2);
+      }
+      section {
+          border: solid 0.05em var(--c1);
+          padding: 0.2em 0 0.6em 0;
+          margin: 0.5em 0;
+          background: rgba(255,255,255,0.025);
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+
+      <!-- <header class="topheader"> -->
+        <!-- <img src="logo.png" alt="Logo" class="logo"> -->
+        <h1>Capture From Browser</h1>
+        <!-- </header> -->
+
+      <section>
+        <p>This is a Web Extension (for Firefox / Chrome / Chromium) that extracts the current page title, url and highlighted text and sends it to a local server.  This allows the you to "capture" the content you highlight in a local file.</p>
+        <p>Ideal for note-taking and saving highlights to a personal file / exobrain.</p>
+      </section>
+      <div style="centered"><a class="repolink" href="https://github.com/precompute/capture-from-browser/">Github Repo ↗</a></div>
+
+      <section>
+        <h2>Features</h2>
+        <ul>
+          <li>Easily change default port</li>
+          <li>Markdown toggle (boolean flag sent to backend)</li>
+          <li>Keyboard shortcuts</li>
+          <li>Textbox for additional context</li>
+          <li>Completely Private: local-only, open source (GPL-3)</li>
+        </ul>
+        <img src="screenshot.webp" alt="Extension Screenshot" class="screenshot">
+      </section>
+
+      <section>
+        <h2>Installation</h2>
+        <p>This extension has not yet been published to the Firefox Addons Store or the Chrome Web Store.  To use it, you need to follow these instructions:<p>
+        <p><b class="blue">For Firefox:</b> Use Nightly. Toggle <b>xpinstall.signatures.required</b> in <b>about:config</b>. Load <b>manifest.json</b> via <b>about:debugging</b>.</p>
+        <p><b class="blue">For Chrome/Chromium/Brave:</b> Open <b>chrome://extensions/</b> and enable <b>"Developer Mode"</b>.  Click on the <b>"Load unpacked"</b> button and select the <b>manifest.json</b> file.</p>
+      </section>
+
+      <section>
+        <h2>Default Keybinds</h2>
+        <p>Keybinds can be customized.</p>
+        <p><span class="keybind">Alt+Shift+A</span> <b>Quick Capture</b></p>
+        <p><span class="keybind">Alt+Shift+Z</span> <b>Capture with Context</b></p>
+      </section>
+
+      <section>
+        <h2>Server</h2>
+        <p>The extension POSTs the following JSON to <code>(selected port)/api/capture</code>, which the user should write a server against:</p>
+        <pre>
+          {
+          "source_url": "string",
+          "page_title": "string",
+          "selection_text": "string",
+          "selection_html": "string",
+          "context": "string",
+          "markdown": boolean,
+          "timestamp": "ISO8601"
+          }
+        </pre>
+        <section class="indented">
+          <h3>Included server:</h3>
+          <p>For ease of use, a simple server written in golang is included. This server takes three arguments:</p>
+          <p><span class="keybind">-o</span> <b>File to output to.</b></p>
+          <p><span class="keybind">-p</span> <b>Port to listen on.</b></p>
+          <p><span class="keybind">-f</span> <b>Output Format.</b></p>
+          <p>In lieu of complicated parsing, we use the syntax that <a href="https://pkg.go.dev/os#Expand">os.Expand</a> understands. Expand replaces ${var} or $var in the string based on the mapping function. For example, os.ExpandEnv(s) is equivalent to os.Expand(s, os.Getenv).</p>
+        </section>
+      </section>
+      <section>
+        <h2>Privacy</h2>
+        <p>This extension collects <b>zero</b> data.  It sends data to a local server of your choosing, only when you want it to.  It can only access <code>localhost</code> and <code>127.0.0.1</code>.</p>
+        <p><b>Permissions required:</b> <span class="keybind">activeTab</span>, <span class="keybind">scripting</span> and <span class="keybind">storage</span>.</p>
+      </section>
+    </div>
+
+  </body>
+</html>
