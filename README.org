@@ -76,3 +76,4 @@ Expand replaces ${var} or $var in the string based on the mapping function. For 
 - Edit Selected Text :: Allow editing the selected text before sending it to the backend server.  A dropdown textbox with the text.  If the dropdown is open, take the text from the dropdown, else from the page.
 - Edit Keyboard Shortcuts from the popup :: Not sure if this is possible
 - (Server) Dump file :: Dump /all/ captures to this file.  Probably needs a custom section separator.  ^L?
+- Can Highlighted text be copied? :: Discord, mostly.  Display a warning or copy it some other way
