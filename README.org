@@ -1,6 +1,6 @@
 #+TITLE: Capture From Browser
 
-#+HTML: <img src="logo.png" align="center">
+#+HTML: <img src=".images/logo.png" align="center">
 
 This is a Web Extension (Firefox / Chrome / Chromium / Brave) that extracts the current title, url and highlighted text and sends it to a local server.
 Features:
@@ -9,22 +9,28 @@ Features:
 - Keyboard shortcuts
 - Textbox for additional context
 
-#+HTML: <img src="screenshot.webp" align="center">
+#+HTML: <img src=".images/screenshot.webp" align="center">
 
 Inspired by [[https://github.com/karlicoss/grasp][Grasp]], which is an excellent extension that I have used for years.
 
 
 ** Using The Extension
-You’ll need to load it manually.
+Install via the [[https://addons.mozilla.org/en-US/firefox/addon/capture-from-browser/][Firefox Add-Ons Store]].
+
+#+HTML: <a href="https://addons.mozilla.org/en-US/firefox/addon/capture-from-browser/"><img src=".images/firefoxbadge.svg"></a>
+
+*** Manual Install
+**** Firefox
 For Firefox, you need the Nightly version.  Toggle =xpinstall.signatures.required= (and maybe =xpinstall.whitelist.required= too).
 Then open =about:debugging= and load the =manifest.json= file by clicking on the "Load Temporary Add-On" button in the "This Nightly" section.
-
+**** Chromium-based Browsers
+Open =chrome://extensions/= and enable "Developer Mode".  Click on the =Load unpacked=  button and selectt the =manifest.json= file.
+*** Keybinds
 Default keybinds:
 - M-S-a :: Quick Capture
 - M-S-z :: Capture with Context (opens popup)
 
 You can change the default keybinds if you want.
-
 ** The Backend Server
 This extension requires a backend server running on the port the extension sends data to.  This server is responsible for parsing and printing the data.  The extension is "dumb", it just sends data.
 
