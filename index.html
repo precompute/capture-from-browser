@@ -11,19 +11,19 @@
       document.addEventListener('DOMContentLoaded', function() {
         const themeToggle = document.getElementById('themetoggle');
         const root = document.documentElement;
-      const savedTheme = localStorage.getItem('theme') || 'dark';
-      root.classList.add(savedTheme);
-      themeToggle.addEventListener('click', function() {
-      if (root.classList.contains('dark')) {
-      root.classList.remove('dark');
-      root.classList.add('light');
-      localStorage.setItem('theme', 'light');
-      } else {
-      root.classList.remove('light');
-      root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-      }
-      });
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        root.classList.add(savedTheme);
+        themeToggle.addEventListener('click', function() {
+          if (root.classList.contains('dark')) {
+            root.classList.remove('dark');
+            root.classList.add('light');
+            localStorage.setItem('theme', 'light');
+          } else {
+            root.classList.remove('light');
+            root.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+          }
+        });
       });
     </script>
     <style>
@@ -100,6 +100,17 @@
           content: "** ";
           color: var(--c1);
       }
+      h4 {
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--c2);
+          margin: 0.2em 0 0.1em 0;
+          padding-left: 0.2em;
+      }
+      h4::before {
+          content: "*** ";
+          color: var(--c1);
+      }
       .logo {
           min-width: 10%;
           border: 0.1em solid var(--c1);
@@ -146,7 +157,7 @@
           margin: 0 auto;
       }
       .indented {
-          margin: 0 0.75em;
+          margin: 0.5em 0.75em 0 0.75em;
       }
       .repolink {
           color: var(--c3);
@@ -223,9 +234,24 @@
       </section>
       <section>
         <h2>Installation</h2>
-        <p>This extension has not yet been published to the Firefox Addons Store or the Chrome Web Store.  To use it, you need to follow these instructions:<p>
-        <p><b class="blue">For Firefox:</b> Use Nightly. Toggle <b>xpinstall.signatures.required</b> in <b>about:config</b>. Load <b>manifest.json</b> via <b>about:debugging</b>.</p>
-        <p><b class="blue">For Chrome/Chromium/Brave:</b> Open <b>chrome://extensions/</b> and enable <b>"Developer Mode"</b>.  Click on the <b>"Load unpacked"</b> button and select the <b>manifest.json</b> file.</p>
+        <section class="indented">
+          <h3>Firefox Add-Ons Store</h3>
+          <p>This extension has been accepted to the Firefox Add-Ons Store!!</p>
+          <p><a class="repolink" href="https://addons.mozilla.org/en-US/firefox/addon/capture-from-browser/">Firefox Add-Ons Store ↗</a></p>
+        </section>
+        <section class="indented">
+          <h3>Manual Install</h3>
+          <section class="indented">
+            <h4>Firefox</h4>
+            <p>To test this extension on firefox, follow these steps:</p>
+            <p><b class="blue">For Firefox:</b> Use Nightly. Toggle <b>xpinstall.signatures.required</b> in <b>about:config</b>. Load <b>manifest.json</b> via <b>about:debugging</b>.</p>
+          </section>
+          <section class="indented">
+            <h4>Chrome-based browsers</h4>
+            <p>This extension has not yet been published to the Chrome Web Store.  To use it, you need to follow these instructions:<p>
+            <p><b class="blue">For Chrome/Chromium/Brave:</b> Open <b>chrome://extensions/</b> and enable <b>"Developer Mode"</b>.  Click on the <b>"Load unpacked"</b> button and select the <b>manifest.json</b> file.</p>
+          </section>
+        </section>
       </section>
       <section>
         <h2>Default Keybinds</h2>
