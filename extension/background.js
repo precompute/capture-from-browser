@@ -68,8 +68,8 @@ async function sendToBackend(tabId, tabUrl, data, context) {
   if(!['http:', 'https:', 'file:'].includes(protocol)) {
     return;
   }
-  const {server_port, use_markdown}= await chrome.storage.local.get({
-    server_port: "18080",
+  const {saved_server_port, use_markdown}= await chrome.storage.local.get({
+    saved_server_port: "18080",
     use_markdown: false
   });
   const payload = {
@@ -78,7 +78,7 @@ async function sendToBackend(tabId, tabUrl, data, context) {
     markdown: use_markdown,
     timestamp: new Date().toISOString()
   };
-  const response = await fetch(`http://localhost:${server_port}/api/capture`, {
+  const response = await fetch(`http://localhost:${saved_server_port}/api/capture`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
