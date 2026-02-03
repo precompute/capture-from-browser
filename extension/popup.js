@@ -5,7 +5,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const captureButton = document.getElementById("capture-button");
   const markdownButton = document.getElementById("markdown-button");
   const portInput = document.getElementById("port-input");
-  const captureLog = document.getElementById("capture-log");
+  const captureLogTable = document.getElementById("capture-log-table");
+  const captureLogTableBody = document.getElementById("capture-log-table-body");
   const protocol = new URL(tab.url).protocol;
   // ** Check for invalid URLs
   if(!['http:', 'https:', 'file:'].includes(protocol)) {
@@ -70,12 +71,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   // *** Render and display log
   async function renderActionLog() {
     const {action_log} = await chrome.storage.local.get({action_log: []});
-    if (action_log.length === 0) return;
-    captureLog.replaceChildren();
+    if (action_log.length === 0) {
+      captureLogTable.style.display = "none";
+      return;
+    }
+    captureLogTable.style.display = "table";
+    captureLogTableBody.replaceChildren();
     const currentTime = Date.now();
     action_log.forEach(z => {
-      const line = document.createElement("div");
-      line.className = 'capturelogline';
+      const row = document.createElement("tr");
       const serverStatus = z.status ? "✔" : "✘";
       const timesince = (() => {
         const t = (currentTime - new Date(z.timestamp)) / 1000;
@@ -83,21 +87,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (t<3600) return (t/60).toFixed(1) + "m";
         if (t<86400) return (t/3600).toFixed(1) + "h";
         return (t/86400).toFixed(1) + "d";
-      })().padStart(6, "\u00A0");
+      })();
+      const pageTitle = z.pageTitle ? z.pageTitle.substring(0, 30) : "";
       const domain = new URL(z.url).hostname;
-      const makeSpan = (t, c) => {
-        const span = document.createElement("span");
-        span.textContent = t;
-        span.className = c;
-        line.appendChild(span);
+      const makeCell = (t, c, ti = "") => {
+        const td = document.createElement("td");
+        td.textContent = t;
+        td.className = c;
+        td.title = ti;
+        row.appendChild(td);
       };
-      makeSpan(serverStatus, z.status ? "capturelogline-status-success" : "capturelogline-status-error");
-      makeSpan(timesince, "capturelogline-timesince");
-      makeSpan(z.pageTitle, "capturelogline-pagetitle");
-      makeSpan(domain, "capturelogline-domain");
-      makeSpan(`${z.wordCountSelection}S`, "capturelogline-wordcountselection");
-      makeSpan(`${z.wordCountContext}C`, "capturelogline-wordcountcontext");
-      captureLog.appendChild(line);
+      makeCell(serverStatus,
+               z.status ? "capturelogrow-status-success" : "capturelogrow-status-error",
+               z.status ? "Successful!" : "Error!");
+      makeCell(timesince, "capturelogrow-timesince", new Date(z.timestamp).toLocaleString());
+      makeCell(pageTitle, "capturelogrow-pagetitle", z.pageTitle);
+      makeCell(domain, "capturelogrow-domain", z.url);
+      makeCell(z.wordCountSelection, "capturelogrow-wordcountselection", `Selected ${z.wordCountSelection} words.`);
+      makeCell(z.wordCountContext, "capturelogrow-wordcountcontext", `Entered ${z.wordCountContext} words.`);
+      captureLogTableBody.appendChild(row);
     });
   }
   await renderActionLog();

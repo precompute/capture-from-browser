@@ -53,15 +53,13 @@ async function setVisualStatus(tabId, status, delay=1000) {
 // ** Functions
 // *** Log Actions to LocalStorage
 async function logActions(payload, status) {
-  // We do everything except build the string in background.js so that the popup is fast.
   const {action_log} = await chrome.storage.local.get({action_log: []});
   const wordCountSelection = payload.selection_text ? payload.selection_text.trim().split(/\s+/).length : 0;
   const wordCountContext = payload.context ? payload.context.trim().split(/\s+/).length : 0;
-  const pageTitle = payload.page_title ? payload.page_title.substring(0, 30) : "";
   const logEntry = {
     timestamp: payload.timestamp,
     status: status,
-    pageTitle: pageTitle,
+    pageTitle: payload.page_title,
     url: payload.source_url,
     wordCountSelection: wordCountSelection,
     wordCountContext: wordCountContext

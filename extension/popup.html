@@ -5,13 +5,14 @@
     <style>
       :root {
           --font: Helvetica, Inter, sans-serif;
+          --bg: #171717;
       }
       body {
           min-width: 40em;
           padding: 0.25em;
           font-family: var(--font);
           /* background-color: #050505; */
-          background-color: #171717;
+          background-color: var(--bg);
           color: white;
       }
       .vcontainer {
@@ -84,45 +85,72 @@
       }
       .capturelog {
           overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-          gap: 0.1em;
           height: 10em;
-          justify-content: flex-start;
       }
-      .capturelogline {
-          display: flex;
-          gap: 1em;
-          justify-content: flex-start;
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 0.85em;
+      }
+      thead th {
+          position: sticky;
+          top: 0;
           background-color: black;
-          border-radius: 0.4em 0 0 0.4em;
+          color: #FF4000;
+          text-align: left;
+          padding: 0.1em 0.5em;
+          border-bottom: 0.2em solid var(--bg);
+          border-right: 0.2em solid var(--bg);
+          z-index: 1;
       }
-      .capturelogline-status-success {
+      tr {
+          border-bottom: 0.2em solid var(--bg);
+      }
+      td {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          background-color: black;
+          /* border-bottom: 0.2em solid var(--bg); */
+          border-right: 0.2em solid var(--bg);
+          padding: 0 0.5em;
+      }
+      td:hover {
+          background-color: var(--bg);
+      }
+      td:last-child, th:last-child {
+          border-right: none;
+      }
+      .capturelogrow-status-success {
           color: black;
           background-color: green;
-          border-radius: 0.4em;
+          text-align: center;
       }
-      .capturelogline-status-error {
+      .capturelogrow-status-error {
           color: black;
           background-color: red;
+          text-align: center;
       }
-      .capturelogline-timesince {
+      .capturelogrow-timesince {
           color: green;
-          font-family: monospace;
+          text-align: right;
+          weight: bold;
       }
-      .capturelogline-pagetitle {
+      .capturelogrow-pagetitle {
           color: orange;
       }
-      .capturelogline-domain {
-          color: blue;
+      .capturelogrow-domain {
+          color: lightblue;
       }
-      .capturelogline-wordcountselection {
-          color: purple;
-          font-family: monospace;
+      .capturelogrow-wordcountselection {
+          color: pink;
+          text-align: right;
+          weight: bold;
       }
-      .capturelogline-wordcountcontext {
-          color: purple;
-          font-family: monospace;
+      .capturelogrow-wordcountcontext {
+          color: lightgreen;
+          text-align: right;
+          weight: bold;
       }
       .portinput::-webkit-outer-spin-button,
       .portinput::-webkit-inner-spin-button {
@@ -144,7 +172,21 @@
         <button id="markdown-button" class="markdownbutton">MD</button>
         <input id="port-input" class="portinput" type="number" min="1" max="65535" value="18080" required>
       </div>
-      <div id="capture-log" class="capturelog"></div>
+      <div id="capture-log" class="capturelog">
+        <table id="capture-log-table" style="display: none;">
+          <thead>
+            <tr>
+              <th style="width: 1em; font-size: 0.9em;" title="Server Status">🤠</th>
+              <th title="Time Since (hover for full time)">Time</th>
+              <th title="Page Title (Hover for full title)">Page Title</th>
+              <th title="Domain (Hover for URL)">Domain</th>
+              <th title="Words in Selection">Sel</th>
+              <th title="Words in Context">Ctx</th>
+            </tr>
+          </thead>
+          <tbody id="capture-log-table-body"></tbody>
+        </table>
+      </div>
     </div>
     <script src="popup.js"></script>
   </body>
