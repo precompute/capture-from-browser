@@ -9,9 +9,9 @@
       body {
           min-width: 40em;
           padding: 0.25em;
-          padding-bottom: 0;
           font-family: var(--font);
-          background-color: #050505;
+          /* background-color: #050505; */
+          background-color: #171717;
           color: white;
       }
       .vcontainer {
@@ -31,7 +31,7 @@
           min-height: 5em;
           min-width: 32em;
           resize: both;
-          padding: 0.125em;
+          padding: 0.125em 0.25em;
           box-sizing: border-box;
           background-color: black;
           color: white;
@@ -81,7 +81,48 @@
       }
       .portinput:focus {
           outline: none;
-
+      }
+      .capturelog {
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 0.1em;
+          height: 10em;
+          justify-content: flex-start;
+      }
+      .capturelogline {
+          display: flex;
+          gap: 1em;
+          justify-content: flex-start;
+          background-color: black;
+          border-radius: 0.4em 0 0 0.4em;
+      }
+      .capturelogline-status-success {
+          color: black;
+          background-color: green;
+          border-radius: 0.4em;
+      }
+      .capturelogline-status-error {
+          color: black;
+          background-color: red;
+      }
+      .capturelogline-timesince {
+          color: green;
+          font-family: monospace;
+      }
+      .capturelogline-pagetitle {
+          color: orange;
+      }
+      .capturelogline-domain {
+          color: blue;
+      }
+      .capturelogline-wordcountselection {
+          color: purple;
+          font-family: monospace;
+      }
+      .capturelogline-wordcountcontext {
+          color: purple;
+          font-family: monospace;
       }
       .portinput::-webkit-outer-spin-button,
       .portinput::-webkit-inner-spin-button {
@@ -103,6 +144,7 @@
         <button id="markdown-button" class="markdownbutton">MD</button>
         <input id="port-input" class="portinput" type="number" min="1" max="65535" value="18080" required>
       </div>
+      <div id="capture-log" class="capturelog"></div>
     </div>
     <script src="popup.js"></script>
   </body>

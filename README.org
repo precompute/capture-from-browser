@@ -85,3 +85,4 @@ Expand replaces ${var} or $var in the string based on the mapping function. For 
 - Can Highlighted text be copied? :: Discord, mostly.  Display a warning or copy it some other way
 - OCR :: OCR (via API) would be nice, but would require a lot of work: probably a context menu, and internal text-history 
 - Shortcuts :: Only C-RET is bound right now; we’ll need other shortcuts for these features
+- Capture Indicators :: The icon changes.  But with a selection, maybe the selection should change color, too!

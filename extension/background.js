@@ -51,6 +51,25 @@ async function setVisualStatus(tabId, status, delay=1000) {
 }
 
 // ** Functions
+// *** Log Actions to LocalStorage
+async function logActions(payload, status) {
+  // We do everything except build the string in background.js so that the popup is fast.
+  const {action_log} = await chrome.storage.local.get({action_log: []});
+  const wordCountSelection = payload.selection_text ? payload.selection_text.trim().split(/\s+/).length : 0;
+  const wordCountContext = payload.context ? payload.context.trim().split(/\s+/).length : 0;
+  const pageTitle = payload.page_title ? payload.page_title.substring(0, 30) : "";
+  const logEntry = {
+    timestamp: payload.timestamp,
+    status: status,
+    pageTitle: pageTitle,
+    url: payload.source_url,
+    wordCountSelection: wordCountSelection,
+    wordCountContext: wordCountContext
+  };
+  await chrome.storage.local.set({
+    action_log: [logEntry, ...action_log].slice(0, 50)
+  });
+}
 // *** Perform Quick Capture
 async function performQuickCapture() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -72,11 +91,12 @@ async function sendToBackend(tabId, tabUrl, data, context) {
     saved_server_port: "18080",
     use_markdown: false
   });
+  const currentTimestamp = new Date().toISOString();
   const payload = {
     ...data,
     context: context,
     markdown: use_markdown,
-    timestamp: new Date().toISOString()
+    timestamp: currentTimestamp
   };
   const response = await fetch(`http://localhost:${saved_server_port}/api/capture`, {
     method: "POST",
@@ -84,8 +104,10 @@ async function sendToBackend(tabId, tabUrl, data, context) {
     body: JSON.stringify(payload)
   });
   if (response?.ok) {
+    await logActions(payload, true);
     await setVisualStatus(tabId, true);
   } else {
+    await logActions(payload, false);
     console.warn(response);
     throw new Error("Server error");
   }

@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const captureButton = document.getElementById("capture-button");
   const markdownButton = document.getElementById("markdown-button");
   const portInput = document.getElementById("port-input");
+  const captureLog = document.getElementById("capture-log");
   const protocol = new URL(tab.url).protocol;
   // ** Check for invalid URLs
   if(!['http:', 'https:', 'file:'].includes(protocol)) {
@@ -66,6 +67,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     markdownButton.textContent = enabled ? "✔Markdown" : "✘Markdown";
   }
 
+  // *** Render and display log
+  async function renderActionLog() {
+    const {action_log} = await chrome.storage.local.get({action_log: []});
+    if (action_log.length === 0) return;
+    captureLog.replaceChildren();
+    const currentTime = Date.now();
+    action_log.forEach(z => {
+      const line = document.createElement("div");
+      line.className = 'capturelogline';
+      const serverStatus = z.status ? "✔" : "✘";
+      const timesince = (() => {
+        const t = (currentTime - new Date(z.timestamp)) / 1000;
+        if (t<60) return t.toFixed(1) + "s";
+        if (t<3600) return (t/60).toFixed(1) + "m";
+        if (t<86400) return (t/3600).toFixed(1) + "h";
+        return (t/86400).toFixed(1) + "d";
+      })().padStart(6, "\u00A0");
+      const domain = new URL(z.url).hostname;
+      const makeSpan = (t, c) => {
+        const span = document.createElement("span");
+        span.textContent = t;
+        span.className = c;
+        line.appendChild(span);
+      };
+      makeSpan(serverStatus, z.status ? "capturelogline-status-success" : "capturelogline-status-error");
+      makeSpan(timesince, "capturelogline-timesince");
+      makeSpan(z.pageTitle, "capturelogline-pagetitle");
+      makeSpan(domain, "capturelogline-domain");
+      makeSpan(`${z.wordCountSelection}S`, "capturelogline-wordcountselection");
+      makeSpan(`${z.wordCountContext}C`, "capturelogline-wordcountcontext");
+      captureLog.appendChild(line);
+    });
+  }
+  await renderActionLog();
   // ** Get Data from page
   let captureData = null;
   try {
