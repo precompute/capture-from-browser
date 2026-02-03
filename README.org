@@ -8,6 +8,7 @@ Features:
 - Markdown toggle (boolean flag sent to backend)
 - Keyboard shortcuts
 - Textbox for additional context
+- Local log of previous requests (no selection data logged)
 
 #+HTML: <img src=".images/screenshot.webp" align="center">
 
