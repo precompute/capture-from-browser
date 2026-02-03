@@ -216,6 +216,7 @@
       <section>
         <p>This is a Web Extension (for Firefox / Chrome / Chromium) that extracts the current page title, url and highlighted text and sends it to a local server.  This allows the you to "capture" the content you highlight in a local file.</p>
         <p>Ideal for note-taking and saving highlights to a personal file / exobrain.</p>
+        <p>It includes a (local-only) log of previous requests for your sanity.  No more wondering <i>"oh, did I capture that?" </i>and having to open the capture file to check.</p>
       </section>
       <div class="usefulbuttons">
         <a class="repolink" href="https://github.com/precompute/capture-from-browser/">Github Repo ↗</a>
@@ -228,6 +229,7 @@
           <li>Markdown toggle (boolean flag sent to backend)</li>
           <li>Keyboard shortcuts</li>
           <li>Textbox for additional context</li>
+          <li>Local log of previous requests (stored in LocalStorage)</li>
           <li>Completely Private: local-only, open source (GPLv3)</li>
         </ul>
         <img src="screenshot.webp" alt="Extension Screenshot" class="screenshot">
@@ -273,7 +275,7 @@
         </pre>
         <section class="indented">
           <h3>Included server:</h3>
-          <p>For ease of use, a simple server written in golang is included. This server takes three arguments:</p>
+          <p>For ease of use, a simple server written in golang is included in the repo (separate from the add-on). This server takes three arguments:</p>
           <p><span class="keybind">-o</span> <b>File to output to.</b></p>
           <p><span class="keybind">-p</span> <b>Port to listen on.</b></p>
           <p><span class="keybind">-f</span> <b>Output Format.</b></p>
