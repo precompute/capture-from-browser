@@ -78,7 +78,6 @@ Expand replaces ${var} or $var in the string based on the mapping function. For 
 
 
 ** (TODO) Features 
-- History :: Dropdown, with a list of previous captures, with time of capture and status.  Maybe number of words, too.  Stored in local storage, ~200 limit?
 - Edit Selected Text :: Allow editing the selected text before sending it to the backend server.  A dropdown textbox with the text.  If the dropdown is open, take the text from the dropdown, else from the page.  Contains options for quick custom surrounds around text (blocks)
 - Edit Keyboard Shortcuts from the popup :: Not sure if this is possible
 - (Server) Dump file :: Dump /all/ captures to this file.  Probably needs a custom section separator.  ^L?
@@ -86,3 +85,6 @@ Expand replaces ${var} or $var in the string based on the mapping function. For 
 - OCR :: OCR (via API) would be nice, but would require a lot of work: probably a context menu, and internal text-history 
 - Shortcuts :: Only C-RET is bound right now; we’ll need other shortcuts for these features
 - Capture Indicators :: The icon changes.  But with a selection, maybe the selection should change color, too!
+
+** (DONE) Features
+- History :: Dropdown, with a list of previous captures, with time of capture and status.  Maybe number of words, too.  Stored in local storage, ~200 limit?  Complete on [26-02-04 00:54:59] 
