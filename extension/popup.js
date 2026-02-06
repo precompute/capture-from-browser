@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   portInput.addEventListener("input", () => {
     const valid = validPort(portInput.value);
-    portInput.style.backgroundColor = valid ? "black" : "rgba(255,0,0,0.1)";
+    portInput.style.backgroundColor = valid ? "var(--bg)" : "rgba(255,0,0,0.1)";
     if (valid) {
       chrome.storage.local.set({
         saved_server_port: portInput.value
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (t<86400) return (t/3600).toFixed(1) + "h";
         return (t/86400).toFixed(1) + "d";
       })();
-      const pageTitle = z.pageTitle ? z.pageTitle.substring(0, 30) : "";
+      const pageTitle = z.pageTitle;
       const domain = new URL(z.url).hostname;
       const makeCell = (t, c, ti = "") => {
         const td = document.createElement("td");
@@ -103,8 +103,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       makeCell(timesince, "capturelogrow-timesince", new Date(z.timestamp).toLocaleString());
       makeCell(pageTitle, "capturelogrow-pagetitle", z.pageTitle);
       makeCell(domain, "capturelogrow-domain", z.url);
-      makeCell(z.wordCountSelection, "capturelogrow-wordcountselection", `Selected ${z.wordCountSelection} words.`);
-      makeCell(z.wordCountContext, "capturelogrow-wordcountcontext", `Entered ${z.wordCountContext} words.`);
+      makeCell(z.wordCountSelection,
+               z.wordCountSelection > 0 ? "capturelogrow-wordcountselection" : "capturelogrow-wordcountselectionzero",
+               `Selected ${z.wordCountSelection} words.`);
+      makeCell(z.wordCountContext,
+               z.wordCountContext > 0 ? "capturelogrow-wordcountcontext" : "capturelogrow-wordcountcontextzero",
+               `Entered ${z.wordCountContext} words.`);
       captureLogTableBody.appendChild(row);
     });
   }
