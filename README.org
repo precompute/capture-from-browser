@@ -9,8 +9,11 @@ Features:
 - Keyboard shortcuts
 - Textbox for additional context
 - Local log of previous requests (no selection data logged)
+- Cool UI
 
-#+HTML: <img src=".images/screenshot.webp" align="center">
+#+HTML: <img src=".images/screenshot01.webp" align="center">
+#+HTML: <img src=".images/screenshot02.webp" align="center">
+#+HTML: <img src=".images/screenshot03.webp" align="center">
 
 Inspired by [[https://github.com/karlicoss/grasp][Grasp]], which is an excellent extension that I have used for years.
 
