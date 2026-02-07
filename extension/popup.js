@@ -1,8 +1,8 @@
 // * Popup (GUI)
 document.addEventListener("DOMContentLoaded", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  const contextInput = document.getElementById("context");
-  const previewTextArea = document.getElementById('preview');
+  const contextTextArea = document.getElementById("context");
+  const previewTextArea = document.getElementById("preview");
   const captureButton = document.getElementById("capture-button");
   const previewButton = document.getElementById("preview-button");
   const markdownButton = document.getElementById("markdown-button");
@@ -31,18 +31,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   })
 
   portInput.value = settings.saved_server_port;
-  contextInput.value = settings.saved_context;
+  contextTextArea.value = settings.saved_context;
   updateMarkdownButton(settings.use_markdown);
-  updatePreviewTextArea(settings.show_preview);
   updatePreviewButton(settings.show_preview);
+  updatePreviewTextArea(settings.show_preview);
 
   // *** Save inputarea text
   const saveContextInput = () => {
     chrome.storage.local.set({
-      saved_context: contextInput.value
+      saved_context: contextTextArea.value
     });
   };
-  contextInput.addEventListener("blur", saveContextInput);
+  contextTextArea.addEventListener("blur", saveContextInput);
   window.addEventListener("blur", saveContextInput);
 
   // *** Validate and save port
@@ -144,32 +144,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
   await renderActionLog();
+
+  // *** Calculate word count
+  const wordCount = (str) => str.trim() ? str.trim().split(/\s+/).length : 0;
+  const updateCaptureButton = () => {
+    const selectCount = wordCount(previewTextArea.value);
+    const contextCount = wordCount(contextTextArea.value);
+    captureButton.textContent = `Capture (${selectCount} + ${contextCount})w`;
+    captureButton.style.color = (selectCount + contextCount) > 0 ? "var(--c1)" : "yellow";
+  };
+  contextTextArea.addEventListener("input", updateCaptureButton);
+  previewTextArea.addEventListener("input", updateCaptureButton);
+
   // ** Get Data from page
   let captureData = null;
   try {
     captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
+    contextTextArea.placeholder = "Context Input Area";
     if (captureData?.selection_text) {
-      const wordCount = captureData.selection_text.trim().split(/\s+/).length;
-      captureButton.textContent = `Capture ${wordCount}w`;
-      captureButton.style.color = "var(--c1)";
       previewTextArea.value = captureData.selection_text;
       previewTextArea.style.backgroundColor = "var(--c1-dim)";
       previewTextArea.style.minHeight = "8em";
     } else {
-      captureButton.textContent = "Capture";
-      captureButton.style.color = "yellow";
       previewTextArea.value = "";
       previewTextArea.placeholder = "Nothing Selected.";
       previewTextArea.style.backgroundColor = "var(--c2-dim)";
       previewTextArea.style.minHeight = "1em";
     }
+    updateCaptureButton();
   } catch (e) {
     captureButton.textContent = "Capture Unavailable.";
     captureButton.disabled = true;
+    contextTextArea.placeholder = "";
     previewTextArea.value = "";
     previewTextArea.placeholder = "Capture Unavailable.";
     previewTextArea.style.backgroundColor = "var(--c2-dim)";
-      previewTextArea.style.minHeight = "1em";
+    previewTextArea.style.minHeight = "1em";
     console.error(e);
   }
 
@@ -183,11 +193,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       tabId: tab.id,
       tabUrl: tab.url,
       data: captureData,
-      context: contextInput.value
+      context: contextTextArea.value
     }, (response) => {
       captureButton.disabled = false;
       if (response?.success) {
-        contextInput.value = "";
+        contextTextArea.value = "";
         chrome.storage.local.remove("saved_context");
         window.close();
       } else {
@@ -200,11 +210,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   // *** Keybinds for sending data
   captureButton.addEventListener("click", handleSend);
 
-  contextInput.addEventListener("keydown", (e) => {
+  previewTextArea.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       handleSend();
     }
   });
 
-  contextInput.focus();
+  contextTextArea.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      handleSend();
+    }
+  });
+
+  contextTextArea.focus();
 });
