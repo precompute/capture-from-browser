@@ -5,18 +5,27 @@
     <style>
       :root {
           --font: Helvetica, Inter, sans-serif;
-          --bg: #111;
+          --bg: #191919;
           --c1: #21A167;
           --c1-dim: color-mix(in srgb, var(--c1) 5%, transparent);
           --c2: #971111;
           --c2-dim: color-mix(in srgb, var(--c2) 5%, transparent);
+          --w1: 0.2rem;
+          --w2: 0.4rem;
+      }
+      html {
+          margin: 0 !important;
+          padding: 0 !important;
+          border-radius: 0 !important;
       }
       body {
           min-width: 40em;
-          padding: 0.25em;
+          padding: 0.5em;
+          margin: 0 !important;
           font-family: var(--font);
           background-color: var(--bg);
           color: white;
+          border-radius: 0px !important;
       }
       .vcontainer {
           display: flex;
@@ -78,10 +87,10 @@
           font-weight: bold;
           text-shadow: 2px 2px 0 #111;
           background-color: var(--bg);
-          border-top: 0.15rem solid #2e2e2e;
-          border-left: 0.15rem solid #2e2e2e;
-          border-bottom: 0.15rem solid #000000;
-          border-right: 0.15rem solid #000000;
+          border-top: var(--w1) solid #2e2e2e;
+          border-left: var(--w1) solid #2e2e2e;
+          border-bottom: var(--w1) solid #000000;
+          border-right: var(--w1) solid #000000;
           cursor: pointer;
       }
       button:hover {
@@ -91,27 +100,39 @@
       }
       button:active {
           background-color: var(--bg);
-          border-top: 0.15rem solid #000000;
-          border-left: 0.15rem solid #000000;
-          border-bottom: 0.15rem solid #2e2e2e;
-          border-right: 0.15rem solid #2e2e2e;
+          border-top: var(--w1) solid #000000;
+          border-left: var(--w1) solid #000000;
+          border-bottom: var(--w1) solid #2e2e2e;
+          border-right: var(--w1) solid #2e2e2e;
+          outline: none;
+      }
+      button.enabled {
+          background-color: var(--bg);
+          border-top: var(--w1) solid #000000;
+          border-left: var(--w1) solid #000000;
+          border-bottom: var(--w1) solid #2e2e2e;
+          border-right: var(--w1) solid #2e2e2e;
           outline: none;
       }
       .capturebutton {
           font-size: 1em;
-          flex: 4 0 0;
+          flex: 1 0 0;
           text-align: center;
       }
       .markdownbutton {
-          flex: 1 0 0;
+          flex: 3 0 0;
           text-align: center;
       }
       .previewbutton {
-          flex: 1 0 0;
+          flex: 3 0 0;
+          text-align: center;
+      }
+      .logbutton {
+          flex: 3 0 0;
           text-align: center;
       }
       .portinput {
-          flex: 0.5 0 0;
+          flex: 1 0 0;
           padding: 0.125em 0.75em;
           border: none;
           font-family: var(--font);
@@ -121,10 +142,6 @@
           color: gray;
           text-align: center;
           font-weight: bold;
-          border-top: 0.15rem solid #000000;
-          border-left: 0.15rem solid #000000;
-          border-bottom: 0.15rem solid #2e2e2e;
-          border-right: 0.15rem solid #2e2e2e;
       }
       .portinput:focus {
           outline: none;
@@ -141,7 +158,6 @@
       thead th {
           position: sticky;
           top: 0;
-          /* background-color: black; */
           background-color: var(--bg);
           color: #FF4000;
           text-align: left;
@@ -223,17 +239,20 @@
   </head>
   <body>
     <div class="vcontainer">
+      <div class="hcontainer">
+        <button id="capture-button" class="capturebutton">Capture</button>
+      </div>
+      <div class="hcontainer">
+        <button id="log-button" class="logbutton">Log</button>
+        <button id="preview-button" class="previewbutton">Preview</button>
+        <button id="markdown-button" class="markdownbutton">Markdown</button>
+        <input id="port-input" class="portinput" type="number" min="1" max="65535" value="18080" required>
+      </div>
       <div>
         <textarea id="preview" class="textarea-preview"></textarea>
       </div>
       <div>
         <textarea id="context" class="textarea-context"></textarea>
-      </div>
-      <div class="hcontainer">
-        <button id="capture-button" class="capturebutton">Capture</button>
-        <button id="preview-button" class="previewbutton">Preview</button>
-        <button id="markdown-button" class="markdownbutton">Markdown</button>
-        <input id="port-input" class="portinput" type="number" min="1" max="65535" value="18080" required>
       </div>
       <div id="capture-log" class="capturelog">
         <table id="capture-log-table" style="display: none;">

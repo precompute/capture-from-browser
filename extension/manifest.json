@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Capture From Browser",
-  "version": "1.3",
+  "version": "1.4",
   "description": "Capture title and selection to local backend.",
   "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["http://localhost/*", "http://127.0.0.1/*"],

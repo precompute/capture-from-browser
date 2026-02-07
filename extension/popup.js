@@ -5,8 +5,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const previewTextArea = document.getElementById("preview");
   const captureButton = document.getElementById("capture-button");
   const previewButton = document.getElementById("preview-button");
+  const logButton = document.getElementById("log-button");
   const markdownButton = document.getElementById("markdown-button");
   const portInput = document.getElementById("port-input");
+  const captureLog = document.getElementById("capture-log");
   const captureLogTable = document.getElementById("capture-log-table");
   const captureLogTableBody = document.getElementById("capture-log-table-body");
   let previewTextAreaModified = false;
@@ -29,6 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     saved_server_port: "18080",
     use_markdown: false,
     show_preview: true,
+    show_log: true,
     saved_context: ""
   })
 
@@ -37,6 +40,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   updateMarkdownButton(settings.use_markdown);
   updatePreviewButton(settings.show_preview);
   updatePreviewTextArea(settings.show_preview);
+  changeLogVisibility(settings.show_log);
+  updateLogButton(settings.show_log);
 
   // *** Save inputarea text
   const saveContextInput = () => {
@@ -76,11 +81,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       markdownButton.textContent = "! Markdown";
     } else {
       markdownButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
-      markdownButton.textContent = enabled ? "✔Markdown" : "✘Markdown";
+      markdownButton.classList.toggle("enabled", enabled);
     }
   }
 
-  // *** Save and show Preview status
+  // *** Save Preview status and show Preview
   previewButton.addEventListener('click', () => {
     settings.show_preview = !settings.show_preview;
     chrome.storage.local.set({
@@ -94,7 +99,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   function updatePreviewButton(enabled) {
     previewButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
-    previewButton.textContent = enabled ? "✔Preview" : "✘Preview";
+    previewButton.classList.toggle("enabled", enabled);
+  }
+
+  // *** Save Log status and show Log
+  logButton.addEventListener("click", () => {
+    settings.show_log = !settings.show_log;
+    chrome.storage.local.set({
+      show_log: settings.show_log
+    });
+    updateLogButton(settings.show_log);
+    changeLogVisibility(settings.show_log)
+  });
+  function updateLogButton(enabled) {
+    logButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
+    logButton.classList.toggle("enabled", enabled);
+  }
+  function changeLogVisibility(enabled) {
+    captureLog.style.display = enabled ? 'block' : 'none';
   }
 
   // *** Render and display log
