@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const portInput = document.getElementById("port-input");
   const captureLogTable = document.getElementById("capture-log-table");
   const captureLogTableBody = document.getElementById("capture-log-table-body");
+  let previewTextAreaModified = false;
+  let selectionNotEmpty = false;
   const protocol = new URL(tab.url).protocol;
   // ** Check for invalid URLs
   if(!['http:', 'https:', 'file:'].includes(protocol)) {
@@ -69,8 +71,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateMarkdownButton(settings.use_markdown);
   });
   function updateMarkdownButton(enabled) {
-    markdownButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
-    markdownButton.textContent = enabled ? "✔Markdown" : "✘Markdown";
+    if (enabled && previewTextAreaModified && selectionNotEmpty) {
+      markdownButton.style.color = "yellow";
+      markdownButton.textContent = "! Markdown";
+    } else {
+      markdownButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
+      markdownButton.textContent = enabled ? "✔Markdown" : "✘Markdown";
+    }
   }
 
   // *** Save and show Preview status
@@ -154,7 +161,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     captureButton.style.color = (selectCount + contextCount) > 0 ? "var(--c1)" : "yellow";
   };
   contextTextArea.addEventListener("input", updateCaptureButton);
-  previewTextArea.addEventListener("input", updateCaptureButton);
+  previewTextArea.addEventListener("input", () => {
+    previewTextAreaModified = true;
+    updateCaptureButton();
+    updateMarkdownButton(settings.use_markdown);
+  });
 
   // ** Get Data from page
   let captureData = null;
@@ -162,6 +173,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
     contextTextArea.placeholder = "Context Input Area";
     if (captureData?.selection_text) {
+      selectionNotEmpty = true;
       previewTextArea.value = captureData.selection_text;
       previewTextArea.style.backgroundColor = "var(--c1-dim)";
       previewTextArea.style.minHeight = "8em";
