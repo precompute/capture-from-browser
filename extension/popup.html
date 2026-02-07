@@ -6,6 +6,10 @@
       :root {
           --font: Helvetica, Inter, sans-serif;
           --bg: #111;
+          --c1: #21A167;
+          --c1-dim: color-mix(in srgb, var(--c1) 5%, transparent);
+          --c2: #971111;
+          --c2-dim: color-mix(in srgb, var(--c2) 5%, transparent);
       }
       body {
           min-width: 40em;
@@ -28,12 +32,10 @@
       }
       textarea {
           width: 100%;
-          min-height: 8em;
           min-width: 32em;
           resize: both;
           padding: 0.125em 0.25em;
           box-sizing: border-box;
-          background-color: var(--bg);
           color: white;
           font-family: var(--font);
           outline: none;
@@ -46,10 +48,25 @@
       textarea:focus {
           outline: none;
           box-shadow: none;
-          border-top: 0.15rem solid #000000;
-          border-left: 0.15rem solid #000000;
-          border-bottom: 0.15rem solid #2e2e2e;
-          border-right: 0.15rem solid #2e2e2e;
+          background-color: black;
+          border-top: 0.2rem solid #000000;
+          border-left: 0.2rem solid #000000;
+          border-bottom: 0.2rem solid #2e2e2e;
+          border-right: 0.2rem solid #2e2e2e;
+      }
+      .textarea-context {
+          background-color: var(--bg);
+          min-height: 8em;
+      }
+      .textarea-context:hover {
+          background-color: black;
+      }
+      .textarea-preview {
+          background-color: var(--c1-dim);
+          min-height: 1em;
+      }
+      .textarea-context:hover {
+          background-color: black;
       }
       button {
           height: 100%;
@@ -89,16 +106,19 @@
           flex: 1 0 0;
           text-align: center;
       }
+      .previewbutton {
+          flex: 1 0 0;
+          text-align: center;
+      }
       .portinput {
+          flex: 0.5 0 0;
           padding: 0.125em 0.75em;
           border: none;
-          border-radius: 0.125em;
           font-family: var(--font);
           box-sizing: border-box;
           cursor: text;
           background-color: var(--bg);
           color: gray;
-          width: 10ch;
           text-align: center;
           font-weight: bold;
           border-top: 0.15rem solid #000000;
@@ -130,7 +150,7 @@
           border-bottom: 0.2em solid var(--bg);
           border-right: 0.2em solid var(--bg);
           z-index: 1;
-          width:1px;
+          width: 1px;
       }
       tr {
           border-bottom: 0.2em solid var(--bg);
@@ -142,7 +162,7 @@
           background-color: black;
           border-right: 0.2em solid var(--bg);
           padding: 0 0.5em;
-          max-width: 10vw;
+          max-width: 40vw;
       }
       td:hover {
           background-color: var(--bg);
@@ -152,7 +172,7 @@
       }
       .capturelogrow-status-success {
           color: white;
-          background-color: green;
+          background-color: var(--c1);
           text-align: center;
       }
       .capturelogrow-status-error {
@@ -161,7 +181,7 @@
           text-align: center;
       }
       .capturelogrow-timesince {
-          color: green;
+          color: var(--c1);
           text-align: right;
           font-weight: bold;
       }
@@ -185,11 +205,11 @@
       }
       .capturelogrow-wordcountselectionzero {
           color: white;
-          background-color: #471111;
+          background-color: var(--c2);
       }
       .capturelogrow-wordcountcontextzero {
           color: white;
-          background-color: #471111;
+          background-color: var(--c2);
       }
       .portinput::-webkit-outer-spin-button,
       .portinput::-webkit-inner-spin-button {
@@ -204,11 +224,15 @@
   <body>
     <div class="vcontainer">
       <div>
-        <textarea id="context"></textarea>
+        <textarea id="context" class="textarea-context"></textarea>
+      </div>
+      <div>
+        <textarea id="preview" class="textarea-preview"></textarea>
       </div>
       <div class="hcontainer">
         <button id="capture-button" class="capturebutton">Capture</button>
-        <button id="markdown-button" class="markdownbutton">MD</button>
+        <button id="preview-button" class="previewbutton">Preview</button>
+        <button id="markdown-button" class="markdownbutton">Markdown</button>
         <input id="port-input" class="portinput" type="number" min="1" max="65535" value="18080" required>
       </div>
       <div id="capture-log" class="capturelog">

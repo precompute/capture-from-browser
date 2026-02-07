@@ -2,7 +2,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const contextInput = document.getElementById("context");
+  const previewTextArea = document.getElementById('preview');
   const captureButton = document.getElementById("capture-button");
+  const previewButton = document.getElementById("preview-button");
   const markdownButton = document.getElementById("markdown-button");
   const portInput = document.getElementById("port-input");
   const captureLogTable = document.getElementById("capture-log-table");
@@ -24,12 +26,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   let settings = await chrome.storage.local.get({
     saved_server_port: "18080",
     use_markdown: false,
+    show_preview: true,
     saved_context: ""
   })
 
   portInput.value = settings.saved_server_port;
   contextInput.value = settings.saved_context;
   updateMarkdownButton(settings.use_markdown);
+  updatePreviewTextArea(settings.show_preview);
+  updatePreviewButton(settings.show_preview);
 
   // *** Save inputarea text
   const saveContextInput = () => {
@@ -64,8 +69,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateMarkdownButton(settings.use_markdown);
   });
   function updateMarkdownButton(enabled) {
-    markdownButton.style.color = enabled ? "green" : "red";
+    markdownButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
     markdownButton.textContent = enabled ? "✔Markdown" : "✘Markdown";
+  }
+
+  // *** Save and show Preview status
+  previewButton.addEventListener('click', () => {
+    settings.show_preview = !settings.show_preview;
+    chrome.storage.local.set({
+      show_preview: settings.show_preview
+    });
+    updatePreviewTextArea(settings.show_preview);
+    updatePreviewButton(settings.show_preview);
+  });
+  function updatePreviewTextArea(enabled) {
+    previewTextArea.style.display = enabled ? 'block' : 'none';
+  }
+  function updatePreviewButton(enabled) {
+    previewButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
+    previewButton.textContent = enabled ? "✔Preview" : "✘Preview";
   }
 
   // *** Render and display log
@@ -89,7 +111,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         return (t/86400).toFixed(1) + "d";
       })();
       const pageTitle = z.pageTitle;
-      const domain = new URL(z.url).hostname;
+
+      let domain = "";
+      let pageURL = z.url ? z.url : "Blank URL!";
+      try {
+        domain = z.url ? new URL(z.url).hostname : "Unknown";
+      } catch (e) { // unlikely to happen.  Keeping it in because of a bug during testing (invalid localstorage state)
+        domain = "Blank URL!";
+        pageURL = "Blank URL!";
+      }
+
       const makeCell = (t, c, ti = "") => {
         const td = document.createElement("td");
         td.textContent = t;
@@ -102,7 +133,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                z.status ? "Successful!" : "Error!");
       makeCell(timesince, "capturelogrow-timesince", new Date(z.timestamp).toLocaleString());
       makeCell(pageTitle, "capturelogrow-pagetitle", z.pageTitle);
-      makeCell(domain, "capturelogrow-domain", z.url);
+      makeCell(domain, "capturelogrow-domain", pageURL);
       makeCell(z.wordCountSelection,
                z.wordCountSelection > 0 ? "capturelogrow-wordcountselection" : "capturelogrow-wordcountselectionzero",
                `Selected ${z.wordCountSelection} words.`);
@@ -120,20 +151,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (captureData?.selection_text) {
       const wordCount = captureData.selection_text.trim().split(/\s+/).length;
       captureButton.textContent = `Capture ${wordCount}w`;
-      captureButton.style.color = "green";
+      captureButton.style.color = "var(--c1)";
+      previewTextArea.value = captureData.selection_text;
+      previewTextArea.style.backgroundColor = "var(--c1-dim)";
+      previewTextArea.style.minHeight = "8em";
     } else {
       captureButton.textContent = "Capture";
       captureButton.style.color = "yellow";
+      previewTextArea.value = "";
+      previewTextArea.placeholder = "Nothing Selected.";
+      previewTextArea.style.backgroundColor = "var(--c2-dim)";
+      previewTextArea.style.minHeight = "1em";
     }
   } catch (e) {
-    captureButton.textContent = "No Capture Data";
+    captureButton.textContent = "Capture Unavailable.";
     captureButton.disabled = true;
+    previewTextArea.value = "";
+    previewTextArea.placeholder = "Capture Unavailable.";
+    previewTextArea.style.backgroundColor = "var(--c2-dim)";
+      previewTextArea.style.minHeight = "1em";
     console.error(e);
   }
 
   // ** Send Data
   const handleSend = async () => {
     if (!captureData) return;
+    captureData.selection_text = previewTextArea.value;
     captureButton.disabled = true;
     chrome.runtime.sendMessage({
       action: "SEND_DATA",
@@ -149,7 +192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.close();
       } else {
         captureButton.textContent = "Server Error";
-        captureButton.style.color = "red";
+        captureButton.style.color = "var(--c2)";
       }
     });
   };
