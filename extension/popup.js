@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let captureData = null;
   try {
     captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
-    contextTextArea.placeholder = "Context Input Area";
+    contextTextArea.placeholder = "Context Input Area.  Press C-RET to capture.";
     if (captureData?.selection_text) {
       selectionNotEmpty = true;
       previewTextArea.value = captureData.selection_text;

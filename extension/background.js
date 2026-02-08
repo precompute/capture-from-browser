@@ -6,7 +6,8 @@ chrome.commands.onCommand.addListener((command) => {
     performQuickCapture();
   }
 });
-// *** Requests for sending data to the backend
+// *** Requests
+// **** Requests for sending data to the backend
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if(request.action === "SEND_DATA") {
     (async () => {
@@ -23,6 +24,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       }
     })();
     return true;
+  }
+  // **** Change Badge according to state
+  if (request.action === "SELECTION_BADGE") {
+    const tabId = sender.tab.id;
+    if (request.sActive) {
+      chrome.action.setBadgeText({ tabId: tabId, text: "++" });
+      chrome.action.setBadgeBackgroundColor({ tabId: tabId, color: "#1979EA" });
+    } else {
+      chrome.action.setBadgeText({ tabId: tabId, text: "" });
+    }
+    return false;
   }
 });
 
