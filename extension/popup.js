@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const previewTextArea = document.getElementById("preview");
   const captureButton = document.getElementById("capture-button");
   const previewButton = document.getElementById("preview-button");
+  const settingsButton = document.getElementById("settings-button");
+  const settingsMenu = document.getElementById("settings-menu");
   const logButton = document.getElementById("log-button");
   const markdownButton = document.getElementById("markdown-button");
   const portInput = document.getElementById("port-input");
@@ -52,6 +54,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   contextTextArea.addEventListener("blur", saveContextInput);
   window.addEventListener("blur", saveContextInput);
 
+  // *** Interactivity for Settings Menu
+  settingsButton.addEventListener('click', () => {
+    settingsMenu.style.display = settingsMenu.style.display === 'flex' ? 'none' : 'flex';
+    settingsButton.classList.toggle('enabled');
+  });
   // *** Validate and save port
   function validPort(val) {
     const port = parseInt(val, 10);
