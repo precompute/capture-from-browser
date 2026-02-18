@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const previewTextArea = document.getElementById("preview");
   const captureButton = document.getElementById("capture-button");
   const previewButton = document.getElementById("preview-button");
+  const extractlinksButton = document.getElementById("extract-links-button");
   const settingsButton = document.getElementById("settings-button");
   const settingsMenu = document.getElementById("settings-menu");
   const logButton = document.getElementById("log-button");
@@ -15,6 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const captureLogTableBody = document.getElementById("capture-log-table-body");
   let previewTextAreaModified = false;
   let selectionNotEmpty = false;
+  let linksString = "";
   const protocol = new URL(tab.url).protocol;
   // ** Check for invalid URLs
   if(!['http:', 'https:', 'file:'].includes(protocol)) {
@@ -109,6 +111,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     previewButton.classList.toggle("enabled", enabled);
   }
 
+  // *** Append links to context textarea
+  extractlinksButton.addEventListener('click', () => {
+    if (!linksString) return;
+    contextTextArea.value += '\n' + linksString;
+    updateCaptureButton();
+  });
+
   // *** Save Log status and show Log
   logButton.addEventListener("click", () => {
     settings.show_log = !settings.show_log;
@@ -201,6 +210,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
     contextTextArea.placeholder = "Context Input Area.  Press C-RET to capture.";
+
+    if (captureData?.selection_html) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(captureData.selection_html, "text/html");
+      const links = Array.from(doc.querySelectorAll('a')).filter(z => {
+        return z.textContent.trim().length > 0 && z.href;
+      });
+      if (links.length > 0) {
+        extractlinksButton.style.display = "block";
+        extractlinksButton.textContent = `Insert ${links.length} Links`;
+        linksString = links.map(z => {
+          return `[[${z.href}][${z.textContent}]]`;
+        }).join('\n');
+      } else extractlinksButton.style.display = "none";
+    } else extractlinksButton.style.display = "none";
+
     if (captureData?.selection_text) {
       selectionNotEmpty = true;
       previewTextArea.value = captureData.selection_text;
@@ -216,6 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (e) {
     captureButton.textContent = "Capture Unavailable.";
     captureButton.disabled = true;
+    extractlinksButton.style.display = "none";
     contextTextArea.placeholder = "";
     previewTextArea.value = "";
     previewTextArea.placeholder = "Capture Unavailable.";
