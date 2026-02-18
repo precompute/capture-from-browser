@@ -57,10 +57,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener("blur", saveContextInput);
 
   // *** Interactivity for Settings Menu
-  settingsButton.addEventListener('click', () => {
+  const toggleSettingsMenu = () => {
     settingsMenu.style.display = settingsMenu.style.display === 'flex' ? 'none' : 'flex';
     settingsButton.classList.toggle('enabled');
-  });
+  }
+  settingsButton.addEventListener('click', toggleSettingsMenu);
+
   // *** Validate and save port
   function validPort(val) {
     const port = parseInt(val, 10);
@@ -112,11 +114,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // *** Append links to context textarea
-  extractlinksButton.addEventListener('click', () => {
+  const extractAndAppendLinks = () => {
     if (!linksString) return;
     contextTextArea.value += '\n' + linksString;
     updateCaptureButton();
-  });
+  };
+
+  extractlinksButton.addEventListener('click', extractAndAppendLinks);
 
   // *** Save Log status and show Log
   logButton.addEventListener("click", () => {
@@ -277,16 +281,34 @@ document.addEventListener("DOMContentLoaded", async () => {
   // *** Keybinds for sending data
   captureButton.addEventListener("click", handleSend);
 
-  previewTextArea.addEventListener("keydown", (e) => {
+  function handleShortcut(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       handleSend();
+      return true;
     }
+    if ((e.ctrlKey || e.metaKey) && e.key === "l") {
+      e.preventDefault();
+      extractAndAppendLinks();
+      return true;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+      e.preventDefault();
+      toggleSettingsMenu();
+      return true;
+    }
+    return false;
+  }
+
+  previewTextArea.addEventListener("keydown", (e) => {
+    handleShortcut(e);
   });
 
   contextTextArea.addEventListener("keydown", (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-      handleSend();
-    }
+    handleShortcut(e);
+  });
+
+  portInput.addEventListener("keydown", (e) => {
+    handleShortcut(e);
   });
 
   contextTextArea.focus();
