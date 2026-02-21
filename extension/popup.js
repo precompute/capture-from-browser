@@ -64,6 +64,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     settingsMenu.style.display = settingsMenu.style.display === 'flex' ? 'none' : 'flex';
     settingsButton.classList.toggle('enabled');
   }
+  function showSettingsMenu() {
+    settingsMenu.style.display = 'flex';
+    settingsButton.classList.add('enabled');
+  }
   settingsButton.addEventListener('click', toggleSettingsMenu);
 
   // *** Validate and save port
@@ -233,8 +237,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let captureData = null;
   try {
     captureData = await chrome.tabs.sendMessage(tab.id, { action: "GET_SELECTION" });
-    contextTextArea.placeholder = "Context Input Area.  Press C-RET to capture.";
-
+    contextTextArea.placeholder = "Context Input Area.\n[C-<return>] SEND TO SERVER\n[C-1] TRIM [C-2] LOG [C-3] PREVIEW [C-4] MARKDOWN [C-5] PORT\n[C-s] SETTINGS";
     if (captureData?.selection_html) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(captureData.selection_html, "text/html");
@@ -323,22 +326,32 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       if (e.key === "1") {
         e.preventDefault();
+        showSettingsMenu();
         toggleTrimButton();
         return true;
       }
       if (e.key === "2") {
         e.preventDefault();
+        showSettingsMenu();
         toggleLogButton();
         return true;
       }
       if (e.key === "3") {
         e.preventDefault();
+        showSettingsMenu();
         togglePreviewButton();
         return true;
       }
       if (e.key === "4") {
         e.preventDefault();
+        showSettingsMenu();
         toggleMarkdownButton();
+        return true;
+      }
+      if (e.key === "5") {
+        e.preventDefault();
+        showSettingsMenu();
+        portInput.focus();
         return true;
       }
     }
