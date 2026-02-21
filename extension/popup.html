@@ -142,6 +142,10 @@
           flex: 3 0 0;
           text-align: center;
       }
+      .trimbutton {
+          flex: 3 0 0;
+          text-align: center;
+      }
       .portinput {
           flex: 1 0 0;
           padding: 0.125em 0.75em;
@@ -256,10 +260,11 @@
         <button id="settings-button" class="settingsbutton" title="Press C-s to toggle.">Settings</button>
       </div>
       <div id="settings-menu" class="hcontainer" style="display:none;">
-        <button id="log-button" class="logbutton">Log</button>
-        <button id="preview-button" class="previewbutton">Preview</button>
-        <button id="markdown-button" class="markdownbutton">Markdown</button>
-        <input id="port-input" class="portinput" type="number" min="1" max="65535" value="18080" required>
+        <button id="log-button" class="logbutton" title="Toggle Log">Log</button>
+        <button id="preview-button" class="previewbutton" title="Toggle Selection Preview">Preview</button>
+        <button id="markdown-button" class="markdownbutton" title="Toggle Markdown option (bool sent to server)">Markdown</button>
+        <button id="trim-button" class="trimbutton" title="Toggle Selection Trim">Trim</button>
+        <input id="port-input" class="portinput" type="number" min="1" max="65535" value="18080" title="Port for backend server" required>
       </div>
       <div>
         <textarea id="preview" class="textarea-preview"></textarea>

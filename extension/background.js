@@ -45,7 +45,7 @@ const DEFAULT_ICON = {
   "128": "/icons/icon128.png"
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r,ms));
-async function setVisualStatus(tabId, status, delay=1000) {
+async function setVisualStatus(tabId, status, delay=500) {
   const icon = status ? "/icons/success.png" :  "/icons/error.png";
   try {
     chrome.action.setIcon({
@@ -97,10 +97,13 @@ async function sendToBackend(tabId, tabUrl, data, context) {
   if(!['http:', 'https:', 'file:'].includes(protocol)) {
     return;
   }
-  const {saved_server_port, use_markdown}= await chrome.storage.local.get({
-    saved_server_port: "18080",
-    use_markdown: false
-  });
+  const {saved_server_port, use_markdown, use_trim} =
+        await chrome.storage.local.get({
+          saved_server_port: "18080",
+          use_markdown: false,
+          use_trim: true
+        });
+  if (use_trim) data.selection_text = data.selection_text.trim();
   const currentTimestamp = new Date().toISOString();
   const payload = {
     ...data,

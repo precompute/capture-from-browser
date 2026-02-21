@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const settingsMenu = document.getElementById("settings-menu");
   const logButton = document.getElementById("log-button");
   const markdownButton = document.getElementById("markdown-button");
+  const trimButton = document.getElementById("trim-button");
   const portInput = document.getElementById("port-input");
   const captureLog = document.getElementById("capture-log");
   const captureLogTable = document.getElementById("capture-log-table");
@@ -36,7 +37,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     use_markdown: false,
     show_preview: true,
     show_log: true,
-    saved_context: ""
+    saved_context: "",
+    use_trim: true
   })
 
   portInput.value = settings.saved_server_port;
@@ -46,6 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   updatePreviewTextArea(settings.show_preview);
   changeLogVisibility(settings.show_log);
   updateLogButton(settings.show_log);
+  updateTrimButton(settings.use_trim);
 
   // *** Save inputarea text
   const saveContextInput = () => {
@@ -94,6 +97,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       markdownButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
       markdownButton.classList.toggle("enabled", enabled);
     }
+  }
+
+  // *** Save Trim status
+  trimButton.addEventListener("click", () => {
+    settings.use_trim = !settings.use_trim;
+    chrome.storage.local.set({
+      use_trim: settings.use_trim
+    });
+    updateTrimButton(settings.use_trim);
+  });
+  function updateTrimButton(enabled) {
+    trimButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
+    trimButton.classList.toggle("enabled", enabled);
   }
 
   // *** Save Preview status and show Preview
@@ -232,7 +248,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (captureData?.selection_text) {
       selectionNotEmpty = true;
-      previewTextArea.value = captureData.selection_text;
+      if (settings.use_trim) {
+        previewTextArea.value = captureData.selection_text.trim();
+      } else {
+        previewTextArea.value = captureData.selection_text;
+      }
       previewTextArea.style.backgroundColor = "var(--c1-dim)";
       previewTextArea.style.minHeight = "8em";
     } else {
@@ -299,17 +319,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     return false;
   }
 
-  previewTextArea.addEventListener("keydown", (e) => {
-    handleShortcut(e);
-  });
-
-  contextTextArea.addEventListener("keydown", (e) => {
-    handleShortcut(e);
-  });
-
-  portInput.addEventListener("keydown", (e) => {
-    handleShortcut(e);
-  });
+  previewTextArea.addEventListener("keydown", (e) => { handleShortcut(e); });
+  contextTextArea.addEventListener("keydown", (e) => { handleShortcut(e); });
+  portInput.addEventListener("keydown", (e) => { handleShortcut(e); });
 
   contextTextArea.focus();
 });
