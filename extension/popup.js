@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener("blur", saveContextInput);
 
   // *** Interactivity for Settings Menu
-  const toggleSettingsMenu = () => {
+  function toggleSettingsMenu() {
     settingsMenu.style.display = settingsMenu.style.display === 'flex' ? 'none' : 'flex';
     settingsButton.classList.toggle('enabled');
   }
@@ -82,13 +82,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // *** Save and show Markdown status
-  markdownButton.addEventListener("click", () => {
+  function toggleMarkdownButton() {
     settings.use_markdown = !settings.use_markdown;
     chrome.storage.local.set({
       use_markdown: settings.use_markdown
     });
     updateMarkdownButton(settings.use_markdown);
-  });
+  }
   function updateMarkdownButton(enabled) {
     if (enabled && previewTextAreaModified && selectionNotEmpty) {
       markdownButton.style.color = "yellow";
@@ -98,29 +98,31 @@ document.addEventListener("DOMContentLoaded", async () => {
       markdownButton.classList.toggle("enabled", enabled);
     }
   }
+  markdownButton.addEventListener("click", toggleMarkdownButton);
 
   // *** Save Trim status
-  trimButton.addEventListener("click", () => {
+  function toggleTrimButton () {
     settings.use_trim = !settings.use_trim;
     chrome.storage.local.set({
       use_trim: settings.use_trim
     });
     updateTrimButton(settings.use_trim);
-  });
+  }
   function updateTrimButton(enabled) {
     trimButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
     trimButton.classList.toggle("enabled", enabled);
   }
+  trimButton.addEventListener("click", toggleTrimButton);
 
   // *** Save Preview status and show Preview
-  previewButton.addEventListener('click', () => {
+  function togglePreviewButton() {
     settings.show_preview = !settings.show_preview;
     chrome.storage.local.set({
       show_preview: settings.show_preview
     });
     updatePreviewTextArea(settings.show_preview);
     updatePreviewButton(settings.show_preview);
-  });
+  }
   function updatePreviewTextArea(enabled) {
     previewTextArea.style.display = enabled ? 'block' : 'none';
   }
@@ -128,6 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     previewButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
     previewButton.classList.toggle("enabled", enabled);
   }
+  previewButton.addEventListener('click', togglePreviewButton);
 
   // *** Append links to context textarea
   const extractAndAppendLinks = () => {
@@ -139,14 +142,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   extractlinksButton.addEventListener('click', extractAndAppendLinks);
 
   // *** Save Log status and show Log
-  logButton.addEventListener("click", () => {
+  function toggleLogButton() {
     settings.show_log = !settings.show_log;
     chrome.storage.local.set({
       show_log: settings.show_log
     });
     updateLogButton(settings.show_log);
     changeLogVisibility(settings.show_log)
-  });
+  }
   function updateLogButton(enabled) {
     logButton.style.color = enabled ? "var(--c1)" : "var(--c2)";
     logButton.classList.toggle("enabled", enabled);
@@ -154,6 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function changeLogVisibility(enabled) {
     captureLog.style.display = enabled ? 'block' : 'none';
   }
+  logButton.addEventListener("click", toggleLogButton);
 
   // *** Render and display log
   async function renderActionLog() {
@@ -302,19 +306,41 @@ document.addEventListener("DOMContentLoaded", async () => {
   captureButton.addEventListener("click", handleSend);
 
   function handleShortcut(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-      handleSend();
-      return true;
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key === "l") {
-      e.preventDefault();
-      extractAndAppendLinks();
-      return true;
-    }
-    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-      e.preventDefault();
-      toggleSettingsMenu();
-      return true;
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === "Enter") {
+        handleSend();
+        return true;
+      }
+      if (e.key === "l") {
+        e.preventDefault();
+        extractAndAppendLinks();
+        return true;
+      }
+      if (e.key === "s") {
+        e.preventDefault();
+        toggleSettingsMenu();
+        return true;
+      }
+      if (e.key === "1") {
+        e.preventDefault();
+        toggleTrimButton();
+        return true;
+      }
+      if (e.key === "2") {
+        e.preventDefault();
+        toggleLogButton();
+        return true;
+      }
+      if (e.key === "3") {
+        e.preventDefault();
+        togglePreviewButton();
+        return true;
+      }
+      if (e.key === "4") {
+        e.preventDefault();
+        toggleMarkdownButton();
+        return true;
+      }
     }
     return false;
   }
